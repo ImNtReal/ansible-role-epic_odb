@@ -206,6 +206,14 @@
     mode: 0755
   with_fileglob: avamar/*
 
+- name: create manage_epicuser_group
+  template:
+    src: manage_epicuser_group.j2
+    dest: /usr/local/bin/manage_epicuser_group
+    owner: root
+    group: root
+    mode: 0775
+
 - name: add cron job for manage_epicuser_group
   file:
     src: /usr/local/bin/manage_epicuser_group
