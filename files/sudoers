@@ -1,11 +1,3 @@
 Cmnd_Alias EPIC_CMDS = /usr/bin/ccontrol, /usr/bin/csession, /usr/bin/su - epicadm, /usr/bin/su - epicdmn
-#%epicodba ALL=(epicadm) ALL
-#%epicodba ALL=(ALL) EPIC_CMDS
 %epicodba ALL=(ALL) ALL
-epicadm ALL=(ALL) ALL
 epicadm ALL=(ALL) NOPASSWD: EPIC_CMDS
-sding ALL=(ALL) ALL
-jboichut ALL=(ALL) ALL
-rejohnso ALL=(ALL) ALL
-support_epic ALL=(ALL) NOPASSWD: ALL
-clveatch ALL=(ALL) NOPASSWD: /epic/sup/bin/epicadm_crontab
