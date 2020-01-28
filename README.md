@@ -25,6 +25,7 @@ Variables set only in inventory:
     EpicEnvironments: List of Epic environments along with their respective instances
     nr_hugepages: Number of hugepages
     firewalld_services: Definition of firewalld services to create
+    epic_passwords: Passwords for local accounts
 
 Dependencies
 ------------
@@ -47,7 +48,14 @@ inventory:
 
         nr_hugepages: 112763
 
-        firewalld_services:
+        epic_passwords:
+          epicadm: $6$CAuJvjioZaK6OfAI$hcU2HIzJG2e8ZaqcUATQ0UzFZPcFrOlUnLC7OV13Ect0A.KKVUC1lRK4KfF26u3r8iZClZOlREwhj4w5kQaVY/
+          epicdmn: $6$W6CPWrIRuKp4VxDK$imCJgLaHLcvXXPx9EbPEalmIe5kBE9H6UbOuisfuuU4vwuFot9n7e7YQUUHnC41QkP3a4JUUtUVkWcsTtLynC1
+          epicsupt: $6$htfX4OnvYGmVTii.$0G81Mp6svyullK3JPwXvBaSbCvh1FOVZnBVYzMWgk14AiSxtjYUWER4de2w989zX7K1zEPebdTYROhoPqui311
+          epictxt: $6$Xi.mHrTLDgFNPq8X$SbLerE4LBeCGNoCvTkksYl6DyPuKcaS4ZT.Tlg9ZWQItmBQup5I5XY60GpareUyX8Cg0EnIYfpSfz3G.dCHU11
+          iscagent: $6$Z8Q4GIqVUkSx71Ig$DqzrkYG5F3.lpnBBptsVX0grwistyWJOo7JfHS5tgqGbBH9uVAJSSi8i5eMQARcLHvt7x335MzE.Ln9SVAKY30
+
+        odb_firewalld_services:
           - name: epiccomm
             description: EpicComm
             ports:
