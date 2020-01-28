@@ -48,6 +48,7 @@ inventory:
 
         nr_hugepages: 112763
 
+        # These should be stored in a vault somewhere
         epic_passwords:
           epicadm: $6$CAuJvjioZaK6OfAI$hcU2HIzJG2e8ZaqcUATQ0UzFZPcFrOlUnLC7OV13Ect0A.KKVUC1lRK4KfF26u3r8iZClZOlREwhj4w5kQaVY/
           epicdmn: $6$W6CPWrIRuKp4VxDK$imCJgLaHLcvXXPx9EbPEalmIe5kBE9H6UbOuisfuuU4vwuFot9n7e7YQUUHnC41QkP3a4JUUtUVkWcsTtLynC1
