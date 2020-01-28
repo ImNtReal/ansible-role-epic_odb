@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# look through epicuser group for users who shouldn't be there
+for user in $(getent group epicuser | cut -d ':' -f 4 | sed 's/,/\n/g' | grep -iv epicadm | grep -iv sding | grep -iv jboichut | grep -iv rejohnso | grep -iv ipswitch | grep -iv support_epic | grep -iv wsftpadmin | grep -iv epiceps_svc | grep -iv epicic_svc); do
+  # check AD membership
+  let membership=$(id $user | grep -c '\(epicodba\)')+$(id $user | grep -c '\(nghs_epicanalysts\)')+$(id $user | grep -c '\(epic_support\)')+$(id $user | grep -c '\(epic_implementations\)')+$(id $user | grep -c '\(nghs_ecsa\)')
+  if [[ $membership -eq 0 ]]; then # if I'm not in at least one AD group, remove me from epicuser
+    gpasswd -d $user epicuser
+  fi
+done
+
+# add members of epicodba to epicuser
+for user in $(getent group epicodba | cut -d ':' -f 4 | sed 's/,/\n/g' | grep -iv epicadm); do
+  usermod -aG epicuser $user
+done
+
+# add members of epic_analysts to epicuser
+for user in $(getent group nghs_epicanalysts | cut -d ':' -f 4 | sed 's/,/\n/g' | grep -iv epicadm); do
+  usermod -aG epicuser $user
+done
+
+# add members of epic_support to epicuser
+for user in $(getent group epic_support | cut -d ':' -f 4 | sed 's/,/\n/g' | grep -iv epicadm); do
+  usermod -aG epicuser $user
+done
+
+# add members of epic_implementations to epicuser
+for user in $(getent group epic_implementations | cut -d ':' -f 4 | sed 's/,/\n/g' | grep -iv epicadm); do
+  usermod -aG epicuser $user
+done
+
+# add members of epic_ts_analysts to epicuser
+for user in $(getent group nghs_ecsa | cut -d ':' -f 4 | sed 's/,/\n/g' | grep -iv epicadm); do
+  usermod -aG epicuser $user
+done
+
+# add non-group users
+for user in $(echo 'epicadm sding jboichut rejohnso ipswitch support_epic wsftpadmin epiceps_svc epicic_svc'); do
+  usermod -aG epicuser $user
+done

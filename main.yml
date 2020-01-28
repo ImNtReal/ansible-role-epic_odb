@@ -1,0 +1,6 @@
+---
+- hosts: "{{ target }}"
+  become: True
+  strategy: free
+  roles:
+    - epic_odb
