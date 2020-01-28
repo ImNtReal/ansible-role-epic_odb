@@ -159,7 +159,7 @@
     path: /epic/certs
     state: directory
     owner: epicadm
-    group: cachesys
+    group: cachegrp
     mode: 0770
 
 - name: ensure encryption keys directory exists
