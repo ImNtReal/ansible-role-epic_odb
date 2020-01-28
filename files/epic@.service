@@ -1,0 +1,18 @@
+[Unit]
+Description=Starts the Cache database and Epic daemons for %I.
+Documentation=https://galaxy.epic.com/?#Browse/page=1!68!30!685354,764704,1714970,1715024
+ConditionFileIsExecutable=/epic/%i/bin/runlevel
+ConditionFileIsExecutable=/epic/%i/bin/runlevel
+RequiresOverridable=ntpd.service
+After=ntpd.service local-fs.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/instctl %i start
+ExecStop=/usr/local/bin/instctl %i stop
+PIDFile=/epic/%i/cachesys/control.pid
+RemainAfterExit=yes
+Restart=no
+
+[Install]
+WantedBy=default.target

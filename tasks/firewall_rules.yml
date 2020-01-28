@@ -1,0 +1,17 @@
+---
+- name: set epic_firewall_short
+  set_fact: epic_firewall_short="{{ item['name'] }}"
+
+- name: set epic_firewall_description
+  set_fact: epic_firewall_description="{{ item['description'] }}"
+
+- name: set epic_firewall_ports
+  set_fact: epic_firewall_ports="{{ item['ports'] }}"
+
+- name: copy {{ epic_firewall_short }} firewall rule
+  template:
+    src: firewalld.xml.j2
+    dest: /etc/firewalld/services/{{ epic_firewall_short }}.xml
+    owner: root
+    group: root
+    mode: 0660

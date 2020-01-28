@@ -1,0 +1,309 @@
+---
+### User and group creation
+- name: create Epic groups
+  group:
+    name: "{{ item['name'] }}"
+    gid: "{{ item['gid'] }}"
+    state: present
+  loop:
+    - { name: 'epicsys', gid: 10000 }
+    - { name: 'epicuser', gid: 10001 }
+    - { name: 'cachegrp', gid: 10002 }
+    - { name: 'dmngrp', gid: 10003 }
+    - { name: 'iscagent', gid: 10004 }
+
+- name: create Epic users
+  user:
+    createhome: yes
+    name: "{{ item['user'] }}"
+    comment: "{{ item['comment'] }}"
+    group: "{{ item['group'] }}"
+    groups: "{{ item['groups'] }}"
+    uid: "{{ item['uid'] }}"
+    state: "{{ item['state'] }}"
+    password: "{{ item['password'] }}"
+  loop: "{{ epic_users }}"
+
+### systemd tweaks
+- name: stop and disable tuned
+  service:
+    name: tuned
+    state: stopped
+    enabled: no
+
+- name: install service files
+  copy:
+    src: "{{ item }}.service"
+    dest: /etc/systemd/system/{{ item }}.service
+    owner: root
+    group: root
+    mode: 0664
+  loop:
+    - epic
+    - epic@
+    - redalert
+
+- name: make sure epic.service is enabled
+  systemd:
+    name: epic
+    enabled: true
+  when: not useepicatservice
+
+- name: make sure epic@.service is enabled
+  systemd:
+    name: epic@{{ item }}
+    enabled: true
+  loop: "{{ CacheInstances }}"
+  when: useepicatservice
+
+- name: enable redalert.service
+  systemd:
+    name: redalert
+    enabled: true
+
+- name: disable alt+ctrl+del
+  file:
+    src: /dev/null
+    dest: /etc/systemd/system/ctrl-alt-del.target
+    state: link
+
+### Security limits and sysctl config options
+- name: configure security limits
+  copy:
+    src: limits
+    dest: /etc/security/limits.d/99-epic.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: configure sysctl
+  sysctl:
+    name: "{{ item['name'] }}"
+    value: "{{ item['value'] }}"
+    sysctl_file: /etc/sysctl.d/99-epic.conf
+    sysctl_set: yes
+    state: present
+    reload: yes
+  with_items:
+    - { name: vm.hugetlb_shm_group, value: 10000 }
+    - { name: kernel.pid_max, value: 4000000 }
+    - { name: kernel.shmmax, value: 2199023255552 }
+    - { name: kernel.msgmnb, value: 65536 }
+    - { name: kernel.core_pattern, value: /epic_core/%e.%h.%p.%t.dump }
+    - { name: vm.swappiness, value: 0 }
+    - { name: kernel.sem, value: 250 256000 32 2048 }
+    - { name: fs.file-max, value: 1000000000 }
+    - { name: net.ipv4.tcp_keepalive_time, value: 600 }
+    - { name: net.ipv4.tcp_keepalive_intvl, value: 60 }
+    - { name: fs.aio-max-nr, value: 524288}
+
+- name: configure hugepage size
+  sysctl:
+    name: vm.nr_hugepages
+    value: "{{ nr_hugepages }}"
+    sysctl_file: /etc/sysctl.d/99-epic.conf
+    sysctl_set: yes
+    state: present
+    reload: yes
+  when: nr_hugepages is defined
+
+- name: add grub options
+  copy:
+    src: grub
+    dest: /etc/default/grub
+    owner: root
+    group: root
+    mode: 0644
+  notify: grub-mkconfig
+
+### Install required packages
+- name: ensure packges needed for Epic are installed
+  yum:
+    name:
+      - perl-core
+      - perl-CGI
+      - perl-XML-Simple
+      - ksh
+      - sysstat
+      - psmisc
+      - cifs-utils
+    state: present
+
+### Directory creation
+- name: create Cache registration files directory
+  file:
+    path: /usr/local/etc/cachesys
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: create core dump directory
+  file:
+    path: /epic_core
+    state: directory
+    owner: epicadm
+    group: cachegrp
+    mode: 0777
+
+- name: create epic directory
+  file:
+    path: /epic
+    state: directory
+    owner: epicadm
+    group: epicsys
+    mode: '2755'
+
+- name: create /epic/certs
+  file:
+    path: /epic/certs
+    state: directory
+    owner: epicadm
+    group: cachesys
+    mode: 0770
+
+- name: ensure encryption keys directory exists
+  file:
+    path: /epic/certs/keys
+    state: directory
+    owner: epicadm
+    group: epicsys
+    mode: 0770
+
+### Copy scripts and miscelaneous files
+- name: copy CA certs
+  copy:
+    src: CA.pem
+    dest: /epic/certs/CA.pem
+    owner: root
+    group: root
+    mode: 0664
+
+- name: copy sshd config
+  copy:
+    src: sshd_config
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: 0600
+  notify: restart_sshd
+
+- name: copy /usr/local/bin files
+  copy:
+    src: "{{ item }}"
+    dest: /usr/local/bin/{{ item | basename }}
+    owner: root
+    group: root
+    mode: 0755
+  with_fileglob: localbin/*
+
+- name: copy /usr/local/avamar/etc/scripts files
+  copy:
+    src: "{{ item }}"
+    dest: /usr/local/avamar/etc/scripts/{{ item | basename }}
+    owner: root
+    group: root
+    mode: 0755
+  with_fileglob: avamar/*
+
+- name: add cron job for manage_epicuser_group
+  file:
+    src: /usr/local/bin/manage_epicuser_group
+    dest: /etc/cron.hourly/manage_epicuser_group
+    state: link
+
+- name: add audit lines to PAM files
+  lineinfile:
+    dest: "{{ item }}"
+    state: present
+    regexp: '^session     required      pam_tty_audit.so'
+    line: 'session     required      pam_tty_audit.so disable=* enable=root,epicadm'
+  loop:
+    - /etc/pam.d/system-auth
+    - /etc/pam.d/password-auth
+  notify:
+    - restartauditd
+
+### Sudoers config
+- name: copy Epic sudoers file
+  copy:
+    src: sudoers
+    dest: /etc/sudoers.d/epic
+    owner: root
+    group: root
+    mode: 0440
+
+- name: create working copy of system sudoers file
+  command: cp -f /etc/sudoers /etc/sudoers.tmp
+  changed_when: False
+
+- name: back up sudoers file
+  command: cp -f /etc/sudoers /etc/sudoers.bak
+  changed_when: False
+
+- name: remove Defaults requiretty
+  lineinfile:
+    dest: /etc/sudoers.tmp
+    state: absent
+    regexp: 'Defaults    requiretty'
+
+- name: check for sudoers differences
+  command: diff /etc/sudoers.tmp /etc/sudoers
+  register: sudoers_diff
+  ignore_errors: Yes
+  changed_when: False
+
+- name: Check working copy of suders file, and replace active sudoers config
+  shell: set -o pipefail |
+    visudo -q -c -f /etc/sudoers.tmp &&
+    cp -f /etc/sudoers.tmp /etc/sudoers
+  register: sudoers_result
+  changed_when: sudoers_result.rc == 0 and sudoers_diff.rc == 1
+
+### Setup firewall rules
+- name: Setup firewall rules
+  include_tasks: firewall_rules.yml
+  loop: "{{ odb_firewalld_services }}"
+
+- name: reload firewalld
+  command: firewall-cmd --reload
+  changed_when: False
+
+- name: enable dynamic Epic firewall rules
+  firewalld:
+    service: "{{ item['name'] }}"
+    permanent: true
+    immediate: yes
+    state: enabled
+  loop: "{{ odb_firewalld_services }}"
+
+- name: Enable SFTP port on firewall
+  firewalld:
+    port: 2222/tcp
+    permanent: yes
+    state: enabled
+
+### Verify /epic is mounted before copying scripts to /epic/bin
+- name: get status of /epic/bin directory
+  stat:
+    path: /epic/bin
+  register: epic_bin
+
+- name: copy start_epic_all.ksh script
+  template:
+    src: start_epic_all.ksh.j2
+    dest: /epic/bin/start_epic_all.ksh
+    owner: epicadm
+    group: epicsys
+    mode: 0744
+  when:
+    - epic_bin['stat']['exists']
+
+- name: copy stop_epic_all.ksh script
+  copy:
+    src: stop_epic_all.ksh
+    dest: /epic/bin/stop_epic_all.ksh
+    owner: epicadm
+    group: epicsys
+    mode: 0744
+  when: epic_bin['stat']['exists']

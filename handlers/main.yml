@@ -1,0 +1,9 @@
+---
+- name: grub-mkconfig
+  command: grub2-mkconfig -o /boot/grub2/grub.cfg
+
+- name: restartauditd
+  command: service auditd restart # noqa 303
+
+- name: restart_sshd
+  service: name=sshd state=restarted
