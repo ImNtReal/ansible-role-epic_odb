@@ -1,24 +1,20 @@
 #!/bin/bash
 
 # look through epicuser group for users who shouldn't be there
-for user in $(getent group epicuser | cut -d ':' -f 4 | sed 's/,/\n/g' \
-{% for item in forced_epicusers %}
-  | grep -iv {{ item }} \
-{% endfor %}
-); do
-  if [[ ! $(id | egrep '{{ epicuser_groups | join('|') }}' ]]; then # if I'm not in at least one AD group, remove me from epicuser
+for user in $(getent group epicuser | cut -d ':' -f 4 | sed 's/,/\n/g' | egrep -iv '{{ forced_epicusers | join("|") }}'); do
+  if [[ ! $(id | egrep '{{ epicuser_groups | join("|") }}' ]]; then # if I'm not in at least one AD group, remove me from epicuser
     gpasswd -d $user epicuser
   fi
 done
 
 {% for item in epicuser_groups %}
-  # add members of {{ item }} to epicuser
-  for user in $(getent group {{ item }} | cut -d ':' -f 4 | sed 's/,/\n/g'); do
-    usermod -aG epicuser $user
-  done
+# add members of {{ item }} to epicuser
+for user in $(getent group {{ item }} | cut -d ':' -f 4 | sed 's/,/\n/g'); do
+  usermod -aG epicuser $user
+done
 {% endfor %}
 
 # add non-group users
 {% for item in forced_epicusers %}
-  usermod -aG epicuser {{ item }}
+usermod -aG epicuser {{ item }}
 {% endfor %}
