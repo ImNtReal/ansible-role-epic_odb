@@ -179,14 +179,41 @@
     group: root
     mode: 0664
 
-- name: copy sshd config
-  copy:
-    src: sshd_config
-    dest: /etc/ssh/sshd_config
-    owner: root
-    group: root
-    mode: 0600
+- name: set sshd to listen on port 2222
+  lineinfile:
+    line: Port 2222
+    regexp: '^Port 2222'
+    insertafter: '^Port 22$'
+    path: /etc/ssh/sshd_config
   notify: restart_sshd
+
+- name: set port 2222 to sftp only
+  blockinfile:
+    block: |
+      Match LocalPort 2222
+        ForceCommand /usr/libexec/openssh/sftp-server -d /epicfiles/
+    path: /etc/ssh/sshd_config
+  notify: restart_sshd
+
+- name: set epic menus for groups
+  blockinfile:
+    block: |
+      Match LocalPort 22 Group {{ item['group'] }}
+        ForceCommand /epic/bin/{{ item['menu'] }}
+    path: /etc/ssh/sshd_config
+  notify: restart_sshd
+  loop: "{{ epicmenu_groups }}"
+  when: epicmenu_groups is defined
+
+- name: set epic menus for users
+  blockinfile:
+    block: |
+      Match LocalPort 22 Group {{ item['user'] }}
+        ForceCommand /epic/bin/{{ item['menu'] }}
+    path: /etc/ssh/sshd_config
+  notify: restart_sshd
+  loop: "{{ epicmenu_users }}"
+  when: epicmenu_users is defined
 
 - name: copy /usr/local/bin files
   copy:
