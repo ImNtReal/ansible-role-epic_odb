@@ -2,7 +2,7 @@
 
 # look through epicuser group for users who shouldn't be there
 for user in $(getent group epicuser | cut -d ':' -f 4 | sed 's/,/\n/g' | egrep -iv '{{ forced_epicusers | join("|") }}'); do
-  if [[ ! $(id | egrep '{{ epicuser_groups | join("|") }}') ]]; then # if I'm not in at least one AD group, remove me from epicuser
+  if [[ ! $(id -Gn $user | egrep '{{ epicuser_groups | join("|") }}') ]]; then # if I'm not in at least one AD group, remove me from epicuser
     gpasswd -d $user epicuser
   fi
 done
