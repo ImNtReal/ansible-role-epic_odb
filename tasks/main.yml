@@ -189,6 +189,7 @@
 
 - name: set port 2222 to sftp only
   blockinfile:
+    marker: "# {mark} ANSIBLE MANAGED BLOCK SFTP Port"
     block: |
       Match LocalPort 2222
         ForceCommand /usr/libexec/openssh/sftp-server -d /epicfiles/
@@ -197,6 +198,7 @@
 
 - name: set epic menus for groups
   blockinfile:
+    marker: "# {mark} ANSIBLE MANAGED BLOCK epicmenu for {{ item['group'] }}"
     block: |
       Match LocalPort 22 Group {{ item['group'] }}
         ForceCommand /epic/bin/{{ item['menu'] }}
@@ -207,8 +209,9 @@
 
 - name: set epic menus for users
   blockinfile:
+    marker: "# {mark} ANSIBLE MANAGED BLOCK epicmenu for {{ item['user'] }}"
     block: |
-      Match LocalPort 22 Group {{ item['user'] }}
+      Match LocalPort 22 User {{ item['user'] }}
         ForceCommand /epic/bin/{{ item['menu'] }}
     path: /etc/ssh/sshd_config
   notify: restart_sshd
