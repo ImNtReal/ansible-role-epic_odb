@@ -6,11 +6,7 @@ for user in $(getent group epicuser | cut -d ':' -f 4 | sed 's/,/\n/g' \
   | grep -iv {{ item }} \
 {% endfor %}
 ); do
-  if [[ ! $(id | egrep '
-{% for item in epicuser_groups %}
-  {{ item }}|
-{% endfor %}
- ' ]]; then # if I'm not in at least one AD group, remove me from epicuser
+  if [[ ! $(id | egrep '{{ epicuser_groups | join('|') }}' ]]; then # if I'm not in at least one AD group, remove me from epicuser
     gpasswd -d $user epicuser
   fi
 done
