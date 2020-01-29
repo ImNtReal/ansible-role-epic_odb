@@ -1,5 +1,5 @@
-Role Name
-=========
+Epic ODB
+========
 
 This role will prepare RHEL servers to act as Epic ODB servers.
 
