@@ -14,7 +14,7 @@
 
 - name: create Epic users
   user:
-    createhome: yes
+    createhome: true
     name: "{{ item['user'] }}"
     comment: "{{ item['comment'] }}"
     group: "{{ item['group'] }}"
@@ -81,9 +81,9 @@
     name: "{{ item['name'] }}"
     value: "{{ item['value'] }}"
     sysctl_file: /etc/sysctl.d/99-epic.conf
-    sysctl_set: yes
+    sysctl_set: true
     state: present
-    reload: yes
+    reload: true
   with_items:
     - {name: vm.hugetlb_shm_group, value: 10000}
     - {name: kernel.pid_max, value: 4000000}
@@ -102,9 +102,9 @@
     name: vm.nr_hugepages
     value: "{{ nr_hugepages }}"
     sysctl_file: /etc/sysctl.d/99-epic.conf
-    sysctl_set: yes
+    sysctl_set: true
     state: present
-    reload: yes
+    reload: true
   when: nr_hugepages is defined
 
 - name: add grub options
@@ -254,8 +254,8 @@
   lineinfile:
     dest: "{{ item }}"
     state: present
-    regexp: '^session     required      pam_tty_audit.so'
-    line: 'session     required      pam_tty_audit.so disable=* enable=root,epicadm'
+    regexp: '^session\s+required\s+pam_tty_audit\.so'
+    line: 'session required pam_tty_audit.so disable=* enable=root,epicadm'
   loop:
     - /etc/pam.d/system-auth
     - /etc/pam.d/password-auth
@@ -288,7 +288,7 @@
 - name: check for sudoers differences
   command: diff /etc/sudoers.tmp /etc/sudoers
   register: sudoers_diff
-  ignore_errors: Yes
+  ignore_errors: true
   changed_when: false
 
 - name: Check working copy of suders file, and replace active sudoers config
@@ -311,14 +311,14 @@
   firewalld:
     service: "{{ item['name'] }}"
     permanent: true
-    immediate: yes
+    immediate: true
     state: enabled
   loop: "{{ odb_firewalld_services }}"
 
 - name: Enable SFTP port on firewall
   firewalld:
     port: 2222/tcp
-    permanent: yes
+    permanent: true
     state: enabled
 
 ### Verify /epic is mounted before copying scripts to /epic/bin
