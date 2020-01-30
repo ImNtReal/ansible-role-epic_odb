@@ -6,11 +6,11 @@
     gid: "{{ item['gid'] }}"
     state: present
   loop:
-    - { name: 'epicsys', gid: 10000 }
-    - { name: 'epicuser', gid: 10001 }
-    - { name: 'cachegrp', gid: 10002 }
-    - { name: 'dmngrp', gid: 10003 }
-    - { name: 'iscagent', gid: 10004 }
+    - {name: 'epicsys', gid: 10000}
+    - {name: 'epicuser', gid: 10001}
+    - {name: 'cachegrp', gid: 10002}
+    - {name: 'dmngrp', gid: 10003}
+    - {name: 'iscagent', gid: 10004}
 
 - name: create Epic users
   user:
@@ -29,7 +29,7 @@
   service:
     name: tuned
     state: stopped
-    enabled: no
+    enabled: false
 
 - name: install service files
   copy:
@@ -85,17 +85,17 @@
     state: present
     reload: yes
   with_items:
-    - { name: vm.hugetlb_shm_group, value: 10000 }
-    - { name: kernel.pid_max, value: 4000000 }
-    - { name: kernel.shmmax, value: 2199023255552 }
-    - { name: kernel.msgmnb, value: 65536 }
-    - { name: kernel.core_pattern, value: /epic_core/%e.%h.%p.%t.dump }
-    - { name: vm.swappiness, value: 0 }
-    - { name: kernel.sem, value: 250 256000 32 2048 }
-    - { name: fs.file-max, value: 1000000000 }
-    - { name: net.ipv4.tcp_keepalive_time, value: 600 }
-    - { name: net.ipv4.tcp_keepalive_intvl, value: 60 }
-    - { name: fs.aio-max-nr, value: 524288}
+    - {name: vm.hugetlb_shm_group, value: 10000}
+    - {name: kernel.pid_max, value: 4000000}
+    - {name: kernel.shmmax, value: 2199023255552}
+    - {name: kernel.msgmnb, value: 65536}
+    - {name: kernel.core_pattern, value: /epic_core/%e.%h.%p.%t.dump}
+    - {name: vm.swappiness, value: 0}
+    - {name: kernel.sem, value: 250 256000 32 2048}
+    - {name: fs.file-max, value: 1000000000}
+    - {name: net.ipv4.tcp_keepalive_time, value: 600}
+    - {name: net.ipv4.tcp_keepalive_intvl, value: 60}
+    - {name: fs.aio-max-nr, value: 524288}
 
 - name: configure hugepage size
   sysctl:
@@ -273,11 +273,11 @@
 
 - name: create working copy of system sudoers file
   command: cp -f /etc/sudoers /etc/sudoers.tmp
-  changed_when: False
+  changed_when: false
 
 - name: back up sudoers file
   command: cp -f /etc/sudoers /etc/sudoers.bak
-  changed_when: False
+  changed_when: false
 
 - name: remove Defaults requiretty
   lineinfile:
@@ -289,7 +289,7 @@
   command: diff /etc/sudoers.tmp /etc/sudoers
   register: sudoers_diff
   ignore_errors: Yes
-  changed_when: False
+  changed_when: false
 
 - name: Check working copy of suders file, and replace active sudoers config
   shell: set -o pipefail |
@@ -305,7 +305,7 @@
 
 - name: reload firewalld
   command: firewall-cmd --reload
-  changed_when: False
+  changed_when: false
 
 - name: enable dynamic Epic firewall rules
   firewalld:

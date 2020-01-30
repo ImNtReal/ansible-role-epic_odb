@@ -7,7 +7,7 @@
       - 'prd'
 
     EpicEnvironments:
-      - { Instance: 'PRD', Environment: 'PRD' }
+      - {Instance: 'PRD', Environment: 'PRD'}
 
     nr_hugepages: 112763
 
