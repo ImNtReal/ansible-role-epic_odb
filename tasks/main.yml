@@ -120,6 +120,11 @@
     mode: 0644
   notify: grub-mkconfig
 
+- name: make sure /boot/grub2 exists
+  file:
+    path: /boot/grub2
+    state: directory
+
 ### Install required packages
 - name: ensure packges needed for Epic are installed
   yum:
