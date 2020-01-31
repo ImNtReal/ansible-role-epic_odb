@@ -183,6 +183,11 @@
     group: root
     mode: 0664
 
+- name: create /etc/ssh
+  file:
+    path: /etc/ssh
+    state: directory
+
 - name: make sure sshd_conig exits
   file:
     path: /etc/ssh/sshd_config
