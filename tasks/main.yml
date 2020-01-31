@@ -122,7 +122,7 @@
     group: root
     mode: 0644
   notify: grub-mkconfig
-  when: 'grub' in ansible_facts['packages']
+  when: "'grub' in ansible_facts['packages']"
 
 ### Install required packages
 - name: ensure packges needed for Epic and role are installed
