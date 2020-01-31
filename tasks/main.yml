@@ -111,6 +111,9 @@
     reload: true
   when: nr_hugepages is defined
 
+- name: gather package facts
+  package_facts:
+
 - name: add grub options
   copy:
     src: grub
@@ -119,11 +122,7 @@
     group: root
     mode: 0644
   notify: grub-mkconfig
-
-- name: make sure /boot/grub2 exists
-  file:
-    path: /boot/grub2
-    state: directory
+  when: 'grub' in ansible_facts['packages']
 
 ### Install required packages
 - name: ensure packges needed for Epic and role are installed
@@ -137,7 +136,6 @@
       - psmisc
       - cifs-utils
       - firewalld
-      - grub2-tools
     state: present
 
 ### Directory creation
