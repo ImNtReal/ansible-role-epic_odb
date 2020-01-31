@@ -126,7 +126,7 @@
     state: directory
 
 ### Install required packages
-- name: ensure packges needed for Epic are installed
+- name: ensure packges needed for Epic and role are installed
   yum:
     name:
       - perl-core
@@ -136,6 +136,8 @@
       - sysstat
       - psmisc
       - cifs-utils
+      - firewalld
+      - grub2-tools
     state: present
 
 ### Directory creation
