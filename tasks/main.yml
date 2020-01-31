@@ -135,6 +135,7 @@
       - sysstat
       - psmisc
       - cifs-utils
+      - sshd
       - firewalld
     state: present
 
