@@ -20,6 +20,12 @@
       iscagent: $6$Z8Q4GIqVUkSx71Ig$DqzrkYG5F3.lpnBBptsVX0grwistyWJOo7JfHS5tgqGbBH9uVAJSSi8i5eMQARcLHvt7x335MzE.Ln9SVAKY30
       # yamllint enable rule:line-length
 
+    forced_epicusers:
+      - epicadm
+
+    epicuser_groups:
+      - epicadm
+
     odb_firewalld_services:
       - name: epiccomm
         description: EpicComm

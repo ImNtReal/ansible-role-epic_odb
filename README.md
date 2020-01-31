@@ -27,6 +27,8 @@ Variables set only in inventory:
     nr_hugepages: Number of hugepages
     firewalld_services: Definition of firewalld services to create
     epic_passwords: Passwords for local accounts
+    forced_epicusers: Users to be added to epicuser group
+    epicuser_groups: Groups of users to be added to epicuser group
 
 Dependencies
 ------------
@@ -56,6 +58,12 @@ inventory:
           epicsupt: $6$htfX4OnvYGmVTii.$0G81Mp6svyullK3JPwXvBaSbCvh1FOVZnBVYzMWgk14AiSxtjYUWER4de2w989zX7K1zEPebdTYROhoPqui311
           epictxt: $6$Xi.mHrTLDgFNPq8X$SbLerE4LBeCGNoCvTkksYl6DyPuKcaS4ZT.Tlg9ZWQItmBQup5I5XY60GpareUyX8Cg0EnIYfpSfz3G.dCHU11
           iscagent: $6$Z8Q4GIqVUkSx71Ig$DqzrkYG5F3.lpnBBptsVX0grwistyWJOo7JfHS5tgqGbBH9uVAJSSi8i5eMQARcLHvt7x335MzE.Ln9SVAKY30
+
+        forced_epicusers:
+          - some_ad_user
+
+        epicuser_groups:
+          - some_ad_group
 
         odb_firewalld_services:
           - name: epiccomm
