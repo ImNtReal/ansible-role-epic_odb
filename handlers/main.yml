@@ -6,4 +6,7 @@
   command: service auditd restart  # noqa 303
 
 - name: restart_sshd
-  service: name=sshd state=restarted
+  service:
+    name: sshd
+    state: restarted
+  when: ansible_facts['services']['sshd'] is defined
