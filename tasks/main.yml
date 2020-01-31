@@ -327,9 +327,8 @@
   include_tasks: firewall_rules.yml
   loop: "{{ odb_firewalld_services }}"
 
-- name: wait for firewalld to start
-  wait_for:
-    path: /sys/fs/cgroup/systemd/system.slice/firewalld.service
+- name: refresh service facts
+  service_facts:
 
 - name: reload firewalld
   command: firewall-cmd --reload
@@ -343,12 +342,14 @@
     immediate: true
     state: enabled
   loop: "{{ odb_firewalld_services }}"
+  when: ansible_facts['services']['firewalld.service']['state'] == 'running'
 
 - name: Enable SFTP port on firewall
   firewalld:
     port: 2222/tcp
     permanent: true
     state: enabled
+  when: ansible_facts['services']['firewalld.service']['state'] == 'running'
 
 ### Verify /epic is mounted before copying scripts to /epic/bin
 - name: get status of /epic/bin directory
