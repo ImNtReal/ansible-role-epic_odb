@@ -25,11 +25,15 @@
   loop: "{{ epic_users }}"
 
 ### systemd tweaks
+- name: load service facts
+  service_facts:
+
 - name: stop and disable tuned
   service:
     name: tuned
     state: stopped
     enabled: false
+  when: ansible_facts['services']['tuned.service'] is defined
 
 - name: install service files
   copy:
