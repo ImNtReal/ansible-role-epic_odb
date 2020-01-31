@@ -327,9 +327,13 @@
     name: firewalld
     state: started
 
+- name: refresh service facts
+  service_facts:
+
 - name: reload firewalld
   command: firewall-cmd --reload
   changed_when: false
+  when: ansible_facts['services']['firewalld.service']['state'] == 'running'
 
 - name: enable dynamic Epic firewall rules
   firewalld:
