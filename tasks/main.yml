@@ -246,15 +246,6 @@
     mode: 0755
   with_fileglob: localbin/*
 
-- name: copy /usr/local/avamar/etc/scripts files
-  copy:
-    src: "{{ item }}"
-    dest: /usr/local/avamar/etc/scripts/{{ item | basename }}
-    owner: root
-    group: root
-    mode: 0755
-  with_fileglob: avamar/*
-
 - name: create manage_epicuser_group
   template:
     src: manage_epicuser_group.j2
