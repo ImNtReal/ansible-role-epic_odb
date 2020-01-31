@@ -280,6 +280,7 @@
     - /etc/pam.d/password-auth
   notify:
     - restartauditd
+  when: "'audit' in ansible_facts['packages']"
 
 ### Sudoers config
 - name: copy Epic sudoers file
