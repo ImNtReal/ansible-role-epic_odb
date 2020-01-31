@@ -313,10 +313,10 @@
   changed_when: sudoers_result.rc == 0 and sudoers_diff.rc == 1
 
 ### Setup firewall rules
-- name: create /etc/firewalld/services
-  file:
-    path: /etc/firewalld/services
-    state: directory
+- name: install firewalld
+  package:
+    name: firewalld
+    state: installed
 
 - name: Setup firewall rules
   include_tasks: firewall_rules.yml
