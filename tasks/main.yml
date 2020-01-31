@@ -322,6 +322,11 @@
   include_tasks: firewall_rules.yml
   loop: "{{ odb_firewalld_services }}"
 
+- name: start firewalld
+  service:
+    name: firewalld
+    state: started
+
 - name: reload firewalld
   command: firewall-cmd --reload
   changed_when: false
