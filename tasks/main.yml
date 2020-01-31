@@ -313,6 +313,11 @@
   changed_when: sudoers_result.rc == 0 and sudoers_diff.rc == 1
 
 ### Setup firewall rules
+- name: create /etc/firewalld/services
+  file:
+    path: /etc/firewalld/services
+    state: directory
+
 - name: Setup firewall rules
   include_tasks: firewall_rules.yml
   loop: "{{ odb_firewalld_services }}"
