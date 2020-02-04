@@ -305,13 +305,8 @@
   changed_when: sudoers_result.rc == 0 and sudoers_diff.rc == 1
 
 ### Setup firewall rules
-- name: install firewalld
-  package:
-    name: firewalld
-    state: installed
-
 - name: start firewalld
-  service:
+  systemd:
     name: firewalld
     state: started
     enabled: true
