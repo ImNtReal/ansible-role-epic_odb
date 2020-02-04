@@ -9,7 +9,7 @@
     EpicEnvironments:
       - {Instance: 'PRD', Environment: 'PRD'}
 
-    nr_hugepages: 112763
+    #nr_hugepages: 112763
 
     epic_passwords:
       # yamllint disable rule:line-length
