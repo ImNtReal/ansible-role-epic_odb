@@ -254,6 +254,7 @@
     src: /usr/local/bin/manage_epicuser_group
     dest: /etc/cron.hourly/manage_epicuser_group
     state: link
+  when: "'cronie' in ansible_facts['packages']"
 
 - name: add audit lines to PAM files
   lineinfile:
