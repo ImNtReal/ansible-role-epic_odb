@@ -135,7 +135,7 @@
       - sysstat
       - psmisc
       - cifs-utils
-      - openssh
+      - openssh-server
       - firewalld
     state: present
 
@@ -193,11 +193,6 @@
   file:
     path: /etc/ssh
     state: directory
-
-- name: make sure sshd_conig exits
-  file:
-    path: /etc/ssh/sshd_config
-    state: touch
 
 - name: set sshd to listen on port 2222
   lineinfile:
