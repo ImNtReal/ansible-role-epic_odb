@@ -108,7 +108,6 @@
     sysctl_file: /etc/sysctl.d/99-epic.conf
     sysctl_set: true
     state: present
-    reload: true
   when: nr_hugepages is defined
 
 - name: gather package facts
@@ -315,6 +314,7 @@
   service:
     name: firewalld
     state: started
+    enabled: true
 
 - name: Setup firewall rules
   include_tasks: firewall_rules.yml
