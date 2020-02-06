@@ -308,18 +308,13 @@
 ### Setup firewall rules
 - name: refresh service facts
   service_facts:
-- debug: var=ansible_facts['services']['firewalld.service']
-- name: wait for firewalld to start
-  wait_for: timeout=300
-  when:
-    - ansible_facts['services']['firewalld.service']['status'] == 'enabled'
-    - ansible_facts['services']['firewalld.service']['state'] != 'running'
 
 - name: start firewalld
   systemd:
     name: firewalld
     state: started
     enabled: true
+  when: ansible_facts['ansible_env']['container'] is not defined
 
 - name: Setup firewall rules
   include_tasks: firewall_rules.yml
