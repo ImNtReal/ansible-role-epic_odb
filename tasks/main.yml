@@ -314,7 +314,7 @@
     name: firewalld
     state: started
     enabled: true
-  when: ansible_facts['ansible_env']['container'] is not defined
+  when: ansible_env['container'] is not defined
 
 - name: Setup firewall rules
   include_tasks: firewall_rules.yml
