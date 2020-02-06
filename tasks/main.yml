@@ -110,19 +110,6 @@
     state: present
   when: nr_hugepages is defined
 
-- name: gather package facts
-  package_facts:
-
-- name: add grub options
-  copy:
-    src: grub
-    dest: /etc/default/grub
-    owner: root
-    group: root
-    mode: 0644
-  notify: grub-mkconfig
-  when: "'grub' in ansible_facts['packages']"
-
 ### Install required packages
 - name: ensure packges needed for Epic and role are installed
   yum:
@@ -137,6 +124,20 @@
       - openssh-server
       - firewalld
     state: present
+
+### Post package install tasks
+- name: gather package facts
+  package_facts:
+
+- name: add grub options
+  copy:
+    src: grub
+    dest: /etc/default/grub
+    owner: root
+    group: root
+    mode: 0644
+  notify: grub-mkconfig
+  when: "'grub' in ansible_facts['packages']"
 
 ### Directory creation
 - name: create Cache registration files directory
