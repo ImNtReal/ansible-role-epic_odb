@@ -26,7 +26,9 @@ Variables set only in inventory:
     EpicEnvironments: List of Epic environments along with their respective instances
     nr_hugepages: Number of hugepages
     firewalld_services: Definition of firewalld services to create
-    epic_passwords: Passwords for local accounts
+    epic_passwords: Password hashes for local accounts. Hashes for RHEL 7 can be
+      generated using: openssl passwd -6 on openssl v1.1 or newer or examples found
+      here: https://unix.stackexchange.com/a/76337/358648
     forced_epicusers: Users to be added to epicuser group
     epicuser_groups: Groups of users to be added to epicuser group
 
