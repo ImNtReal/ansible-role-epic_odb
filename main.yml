@@ -3,4 +3,4 @@
   become: true
   strategy: free
   roles:
-    - epic_odb
+    - imntreal.epic_odb
