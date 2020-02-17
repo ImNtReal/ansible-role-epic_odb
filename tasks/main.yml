@@ -43,15 +43,8 @@
     group: root
     mode: 0664
   loop:
-    - epic
     - epic@
     - redalert
-
-- name: make sure epic.service is enabled
-  systemd:
-    name: epic
-    enabled: true
-  when: not useepicatservice
 
 - name: make sure epic@.service is enabled
   systemd:
@@ -358,22 +351,3 @@
   stat:
     path: /epic/bin
   register: epic_bin
-
-- name: copy start_epic_all.ksh script
-  template:
-    src: start_epic_all.ksh.j2
-    dest: /epic/bin/start_epic_all.ksh
-    owner: epicadm
-    group: epicsys
-    mode: 0744
-  when:
-    - epic_bin['stat']['exists']
-
-- name: copy stop_epic_all.ksh script
-  copy:
-    src: stop_epic_all.ksh
-    dest: /epic/bin/stop_epic_all.ksh
-    owner: epicadm
-    group: epicsys
-    mode: 0744
-  when: epic_bin['stat']['exists']
