@@ -1,0 +1,15 @@
+---
+- name: check for sysctl setting
+  stat:
+    path: /proc/sys/{{ item['name'] | replace('.','/') }}
+  register: sysctl_setting
+
+- name: configure sysctl
+  sysctl:
+    name: "{{ item['name'] }}"
+    value: "{{ item['value'] }}"
+    sysctl_file: /etc/sysctl.d/99-epic.conf
+    sysctl_set: true
+    state: present
+    reload: true
+  when: sysctl_setting['stat']['exists']
