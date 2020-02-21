@@ -1,10 +1,10 @@
 ---
-- name: check for sysctl setting
+- name: check for {{ item['name'] }} sysctl setting
   stat:
     path: /proc/sys/{{ item['name'] | replace('.','/') }}
   register: sysctl_setting
 
-- name: configure sysctl
+- name: configure {{ item['name'] }} sysctl
   sysctl:
     name: "{{ item['name'] }}"
     value: "{{ item['value'] }}"
