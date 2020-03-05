@@ -4,6 +4,7 @@ dependency:
 driver:
   name: docker
 lint: |
+  echo $SHELL
   set -e
   yamllint -c molecule/default/yaml-lint.yml .
   ansible-lint
