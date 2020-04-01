@@ -340,8 +340,15 @@
     state: enabled
   when: ansible_facts['services']['firewalld.service']['state'] == 'running'
 
-### Verify /epic is mounted before copying scripts to /epic/bin
-- name: get status of /epic/bin directory
+### Get status of /etc/vmware-tools before trying to copy file there
+- name: get status of /etc/vmware-tools directory
   stat:
-    path: /epic/bin
-  register: epic_bin
+    path: /etc/vmware-tools
+  register: etc_vmware-tools
+
+- name: copy tools.conf
+  copy:
+    src: tools.conf
+    dest: /etc/vmware-tools/tools.conf
+  when: etc_vwmare-tools['stat']['exists']
+  notify: restart_vmtools
