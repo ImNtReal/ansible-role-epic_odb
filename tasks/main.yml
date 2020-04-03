@@ -350,5 +350,5 @@
   copy:
     src: tools.conf
     dest: /etc/vmware-tools/tools.conf
-  when: etc_vwmaretools['stat']['exists']
+  when: etc_vmwaretools['stat']['exists']
   notify: restart_vmtools
