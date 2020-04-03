@@ -345,6 +345,7 @@
   stat:
     path: /etc/vmware-tools
   register: etc_vmwaretools
+  changed_when: False
 
 - name: copy tools.conf
   copy:
