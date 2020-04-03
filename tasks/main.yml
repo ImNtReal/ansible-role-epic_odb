@@ -344,11 +344,11 @@
 - name: get status of /etc/vmware-tools directory
   stat:
     path: /etc/vmware-tools
-  register: etc_vmware-tools
+  register: etc_vmwaretools
 
 - name: copy tools.conf
   copy:
     src: tools.conf
     dest: /etc/vmware-tools/tools.conf
-  when: etc_vwmare-tools['stat']['exists']
+  when: etc_vwmaretools['stat']['exists']
   notify: restart_vmtools
