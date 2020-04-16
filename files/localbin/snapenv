@@ -40,9 +40,9 @@ if lvs "${lv}_snap" &> /dev/null; then
   exit 2
 fi
 
-lv_name=$(lvs --noheadings -o lv_name "$lv")
-vg=$(lvs --noheadings -o vg_name "$lv")
-vg_free=$(vgs --noheadings --nosuffix --units b -o vg_free "$vg")
+lv_name=$(lvs --noheadings -o lv_name "$lv" | sed 's/ //g')
+vg=$(lvs --noheadings -o vg_name "$lv" | sed 's/ //g')
+vg_free=$(vgs --noheadings --nosuffix --units b -o vg_free "$vg" | sed 's/ //g')
 
 "${inst_path}/bin/instfreeze"
 
@@ -56,6 +56,8 @@ else
   fi
 fi
 
+snap_path="/dev/${vg}/${lv_name}_snap"
+
 "${inst_path}/bin/instthaw"
 
 temp_path="$(mktemp -d)"
@@ -64,10 +66,10 @@ temp_path="$(mktemp -d)"
 udevadm trigger
 
 # If device map exists, mount it.
-if [ -e "${lv}_snap" ]; then
-  mount -o ro "${lv}_snap" "$temp_path"
+if [ -e "$snap_path" ]; then
+  mount -o ro "$snap_path" "$temp_path"
 else
-  echo "ERROR - ${lv}_snap does not exist."
+  echo "ERROR - $snap_path does not exist."
   rmdir "$temp_path"
   exit 3
 fi
