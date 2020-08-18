@@ -15,3 +15,16 @@
   service:
     name: vmtoolsd
     state: restarted
+
+- name: Generate CSR
+  openssl_csr:
+    path: /epic/certs/{{ ansible_hostname }}.csr
+    privatekey_path: /epic/certs/keys/private.key
+    common_name: '{{ ansible_fqdn }}'
+    organizational_unit_name: IT Dept.
+    organization_name: Northeast Georgia Health System
+    locality_name: Gainesville
+    state_or_province_name: Georgia
+    country_name: US
+    subject_alt_name: "{{ item | map('regex_replace', '^', 'DNS:') | list }}"
+  loop: '{{ dnsnames }}'

@@ -360,6 +360,10 @@
   register: epic_private_key
   changed_when: false
 
+- name: Generate private key
+  openssl_privatekey:
+    path: /epic/certs/keys/private.key
+
 - name: Create csr.cnf
   template:
     src: csr.cnf.j2
@@ -367,4 +371,4 @@
     owner: epicadm
     group: cachegrp
     mode: 0664
-
+  notify: Generate CSR
