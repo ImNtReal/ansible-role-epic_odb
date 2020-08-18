@@ -353,3 +353,18 @@
     dest: /etc/vmware-tools/tools.conf
   when: etc_vmwaretools['stat']['exists']
   notify: restart_vmtools
+
+- name: Check private key file
+  stat:
+    path: /epic/certs/keys/private.key
+  register: epic_private_key
+  changed_when: false
+
+- name: Create csr.cnf
+  template:
+    src: csr.cnf.j2
+    dest: /epic/certs/csr.cnf
+    owner: epicadm
+    group: cachegrp
+    mode: 0664
+
