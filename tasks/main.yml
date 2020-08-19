@@ -374,5 +374,4 @@
     locality_name: Gainesville
     state_or_province_name: Georgia
     country_name: US
-    subject_alt_name: "{{ item | map('regex_replace', '^', 'DNS:') | list }}"
-  loop: '{{ dnsnames }}'
+    subject_alt_name: "{{ dnsnames | map('regex_replace', '^', 'DNS:') | list }}"
