@@ -359,6 +359,8 @@
 - name: Generate private key
   openssl_privatekey:
     path: /epic/certs/keys/private.key
+    owner: epicadm
+    group: epicsys
 
 - name: Generate CSR
   openssl_csr:
