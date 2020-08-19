@@ -118,6 +118,7 @@
       - cifs-utils
       - openssh-server
       - firewalld
+      - pyOpenSSL
     state: present
 
 ### Post package install tasks
@@ -353,12 +354,6 @@
     dest: /etc/vmware-tools/tools.conf
   when: etc_vmwaretools['stat']['exists']
   notify: restart_vmtools
-
-- name: Check private key file
-  stat:
-    path: /epic/certs/keys/private.key
-  register: epic_private_key
-  changed_when: false
 
 - name: Generate private key
   openssl_privatekey:
