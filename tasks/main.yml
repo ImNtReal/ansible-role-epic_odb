@@ -119,6 +119,7 @@
       - openssh-server
       - firewalld
       - pyOpenSSL
+      - python2-cryptography
     state: present
 
 ### Post package install tasks
