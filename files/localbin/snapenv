@@ -52,7 +52,7 @@ else
   if [[ "$(echo "$vg_free * 0.9 % 512" | bc | cut -d '.' -f 1)" -eq 0 ]]; then # If 90% of free space is divisable by 512
     lvcreate -L "$(echo "$vg_free * 0.9" | bc | cut -d '.' -f 1)B" -s -n "${lv_name}_snap" "$lv"
   else
-    lvcreate -L "$(echo "512 * (($vg_free * 0.9) / 512)" | bc | cut -d '.' -f 1)B" -s -n "${lv_name}_sanp" "$lv"
+    lvcreate -L "$(echo "512 * (($vg_free * 0.9) / 512)" | bc | cut -d '.' -f 1)B" -s -n "${lv_name}_snap" "$lv"
   fi
 fi
 
