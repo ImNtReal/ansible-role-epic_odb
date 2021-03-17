@@ -373,3 +373,28 @@
     state_or_province_name: Georgia
     country_name: US
     subject_alt_name: "{{ dnsnames | map('regex_replace', '^', 'DNS:') | list }}"
+
+- name: check for chrony.conf
+  stat:
+    path: /etc/chrony.conf
+    register: chrony_conf_stat
+    changed_when: false
+
+- name: update chrony config
+  block:
+    - name: disable makestep
+      lineinfile:
+        path: /etc/chrony.conf
+        regexp: 'makestep'
+        line: '#makestep 2'
+    - name: set minsources to 2
+      lineinfile:
+        path: /etc/chrony.conf
+        regexp: '^minsources'
+        line: 'minsources = 2'
+    - name: set logchange to 0.5
+      lineinfile:
+        path: /etc/chrony.conf
+        regexp: '^logchange'
+        line: 'logchange 0.5'
+  when: chrony_conf_stat['stat']['exists']
