@@ -377,8 +377,8 @@
 - name: check for chrony.conf
   stat:
     path: /etc/chrony.conf
-    register: chrony_conf_stat
-    changed_when: false
+  register: chrony_conf_stat
+  changed_when: false
 
 - name: update chrony config
   block:
