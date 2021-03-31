@@ -167,7 +167,7 @@
     state: directory
     owner: epicadm
     group: cachegrp
-    mode: 0770
+    mode: 0750
 
 - name: ensure encryption keys directory exists
   file:
