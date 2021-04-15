@@ -393,7 +393,7 @@
       lineinfile:
         path: /etc/chrony.conf
         regexp: '^minsources'
-        line: 'minsources = 2'
+        line: 'minsources 2'
     - name: set logchange to 0.5
       lineinfile:
         path: /etc/chrony.conf
