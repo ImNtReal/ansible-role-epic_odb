@@ -175,7 +175,7 @@
     state: directory
     owner: epicadm
     ansible.builtin.group: epicsys
-    mode: 0770
+    mode: 0700
 
 ### Copy scripts and miscelaneous files
 - name: copy CA certs
