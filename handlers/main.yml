@@ -6,13 +6,13 @@
   command: service auditd restart  # noqa 303
 
 - name: restart_sshd
-  service:
+  ansible.builtin.service:
     name: sshd
     state: restarted
   when: ansible_facts['services']['sshd'] is defined
 
 - name: restart_vmtools
-  service:
+  ansible.builtin.service:
     name: vmtoolsd
     state: restarted
 

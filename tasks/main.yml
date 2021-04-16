@@ -1,7 +1,7 @@
 ---
 ### User and group creation
 - name: create Epic groups
-  group:
+  ansible.builtin.group:
     name: "{{ item['name'] }}"
     gid: "{{ item['gid'] }}"
     state: present
@@ -13,11 +13,11 @@
     - {name: 'iscagent', gid: 10004}
 
 - name: create Epic users
-  user:
+  ansible.builtin.user:
     createhome: true
     name: "{{ item['user'] }}"
     comment: "{{ item['comment'] }}"
-    group: "{{ item['group'] }}"
+    ansible.builtin.group: "{{ item['group'] }}"
     groups: "{{ item['groups'] }}"
     uid: "{{ item['uid'] }}"
     state: "{{ item['state'] }}"
@@ -29,48 +29,48 @@
   service_facts:
 
 - name: stop and disable tuned
-  service:
+  ansible.builtin.service:
     name: tuned
     state: stopped
     enabled: false
   when: ansible_facts['services']['tuned.service'] is defined
 
 - name: install service files
-  copy:
+  ansible.builtin.copy:
     src: "{{ item }}.service"
     dest: /etc/systemd/system/{{ item }}.service
     owner: root
-    group: root
+    ansible.builtin.group: root
     mode: 0664
   loop:
     - epic@
     - redalert
 
 - name: make sure epic@.service is enabled
-  systemd:
+  ansible.builtin.systemd:
     name: epic@{{ item }}
     enabled: true
   loop: "{{ CacheInstances }}"
   when: useepicatservice
 
 - name: enable redalert.service
-  systemd:
+  ansible.builtin.systemd:
     name: redalert
     enabled: true
 
 - name: disable alt+ctrl+del
-  file:
+  ansible.builtin.file:
     src: /dev/null
     dest: /etc/systemd/system/ctrl-alt-del.target
     state: link
 
 ### Security limits and sysctl config options
 - name: configure security limits
-  copy:
+  ansible.builtin.copy:
     src: limits
     dest: /etc/security/limits.d/99-epic.conf
     owner: root
-    group: root
+    ansible.builtin.group: root
     mode: 0644
 
 - name: check and config sysctl
@@ -97,7 +97,7 @@
     - {name: net.ipv4.tcp_keepalive_intvl, value: 60}
 
 - name: configure hugepage size
-  sysctl:
+  ansible.posix.sysctl:
     name: vm.nr_hugepages
     value: "{{ nr_hugepages }}"
     sysctl_file: /etc/sysctl.d/99-epic.conf
@@ -107,7 +107,7 @@
 
 ### Install required packages
 - name: ensure packges needed for Epic and role are installed
-  yum:
+  ansible.builtin.yum:
     name:
       - perl-core
       - perl-CGI
@@ -127,72 +127,72 @@
   package_facts:
 
 - name: add grub options
-  copy:
+  ansible.builtin.copy:
     src: grub
     dest: /etc/default/grub
     owner: root
-    group: root
+    ansible.builtin.group: root
     mode: 0644
   notify: grub-mkconfig
   when: "'grub' in ansible_facts['packages']"
 
 ### Directory creation
 - name: create Cache registration files directory
-  file:
+  ansible.builtin.file:
     path: /usr/local/etc/cachesys
     state: directory
     owner: root
-    group: root
+    ansible.builtin.group: root
     mode: 0755
 
 - name: create core dump directory
-  file:
+  ansible.builtin.file:
     path: /epic_core
     state: directory
     owner: epicadm
-    group: cachegrp
+    ansible.builtin.group: cachegrp
     mode: 0777
 
 - name: create epic directory
-  file:
+  ansible.builtin.file:
     path: /epic
     state: directory
     owner: epicadm
-    group: epicsys
+    ansible.builtin.group: epicsys
     mode: '2755'
 
 - name: create /epic/certs
-  file:
+  ansible.builtin.file:
     path: /epic/certs
     state: directory
     owner: epicadm
-    group: cachegrp
+    ansible.builtin.group: cachegrp
     mode: 0750
 
 - name: ensure encryption keys directory exists
-  file:
+  ansible.builtin.file:
     path: /epic/certs/keys
     state: directory
     owner: epicadm
-    group: epicsys
+    ansible.builtin.group: epicsys
     mode: 0770
 
 ### Copy scripts and miscelaneous files
 - name: copy CA certs
-  copy:
+  ansible.builtin.copy:
     src: CA.pem
     dest: /epic/certs/CA.pem
     owner: root
-    group: root
+    ansible.builtin.group: root
     mode: 0664
 
 - name: create /etc/ssh
-  file:
+  ansible.builtin.file:
     path: /etc/ssh
     state: directory
 
 - name: set sshd to listen on port 2222
-  lineinfile:
+  ansible.builtin.lineinfile:
     line: Port 2222
     regexp: '^Port 2222'
     insertafter: '^Port 22$'
@@ -200,7 +200,7 @@
   notify: restart_sshd
 
 - name: set port 2222 to sftp only
-  blockinfile:
+  ansible.builtin.blockinfile:
     marker: "# {mark} ANSIBLE MANAGED BLOCK SFTP Port"
     block: |
       Match LocalPort 2222
@@ -209,7 +209,7 @@
   notify: restart_sshd
 
 - name: set epic menus for groups
-  blockinfile:
+  ansible.builtin.blockinfile:
     marker: "# {mark} ANSIBLE MANAGED BLOCK epicmenu for {{ item['group'] }}"
     block: |
       Match LocalPort 22 Group {{ item['group'] }}
@@ -220,7 +220,7 @@
   when: epicmenu_groups is defined
 
 - name: set epic menus for users
-  blockinfile:
+  ansible.builtin.blockinfile:
     marker: "# {mark} ANSIBLE MANAGED BLOCK epicmenu for {{ item['user'] }}"
     block: |
       Match LocalPort 22 User {{ item['user'] }}
@@ -231,31 +231,31 @@
   when: epicmenu_users is defined
 
 - name: copy /usr/local/bin files
-  copy:
+  ansible.builtin.copy:
     src: "{{ item }}"
     dest: /usr/local/bin/{{ item | basename }}
     owner: root
-    group: root
+    ansible.builtin.group: root
     mode: 0755
   with_fileglob: localbin/*
 
 - name: create manage_epicuser_group
-  template:
+  ansible.builtin.template:
     src: manage_epicuser_group.j2
     dest: /usr/local/bin/manage_epicuser_group
     owner: root
-    group: root
+    ansible.builtin.group: root
     mode: 0775
 
 - name: add cron job for manage_epicuser_group
-  file:
+  ansible.builtin.file:
     src: /usr/local/bin/manage_epicuser_group
     dest: /etc/cron.hourly/manage_epicuser_group
     state: link
   when: "'cronie' in ansible_facts['packages']"
 
 - name: add audit lines to PAM files
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "{{ item }}"
     state: present
     regexp: '^session\s+required\s+pam_tty_audit\.so'
@@ -269,11 +269,11 @@
 
 ### Sudoers config
 - name: copy Epic sudoers file
-  copy:
+  ansible.builtin.copy:
     src: sudoers
     dest: /etc/sudoers.d/epic
     owner: root
-    group: root
+    ansible.builtin.group: root
     mode: 0440
 
 - name: create working copy of system sudoers file
@@ -285,7 +285,7 @@
   changed_when: false
 
 - name: remove Defaults requiretty
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/sudoers.tmp
     state: absent
     regexp: 'Defaults    requiretty'
@@ -308,7 +308,7 @@
   service_facts:
 
 - name: start firewalld
-  systemd:
+  ansible.builtin.systemd:
     name: firewalld
     state: started
     enabled: true
@@ -327,8 +327,8 @@
   when: ansible_facts['services']['firewalld.service']['state'] == 'running'
 
 - name: enable dynamic Epic firewall rules
-  firewalld:
-    service: "{{ item['name'] }}"
+  ansible.posix.firewalld:
+    ansible.builtin.service: "{{ item['name'] }}"
     permanent: true
     immediate: true
     state: enabled
@@ -336,7 +336,7 @@
   when: ansible_facts['services']['firewalld.service']['state'] == 'running'
 
 - name: Enable SFTP port on firewall
-  firewalld:
+  ansible.posix.firewalld:
     port: 2222/tcp
     permanent: true
     state: enabled
@@ -344,27 +344,27 @@
 
 ### Get status of /etc/vmware-tools before trying to copy file there
 - name: get status of /etc/vmware-tools directory
-  stat:
+  ansible.builtin.stat:
     path: /etc/vmware-tools
   register: etc_vmwaretools
   changed_when: False
   check_mode: false
 
 - name: copy tools.conf
-  copy:
+  ansible.builtin.copy:
     src: tools.conf
     dest: /etc/vmware-tools/tools.conf
   when: etc_vmwaretools['stat']['exists']
   notify: restart_vmtools
 
 - name: Generate private key
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: /epic/certs/keys/private.key
     owner: epicadm
-    group: epicsys
+    ansible.builtin.group: epicsys
 
 - name: Generate CSR
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: /epic/certs/{{ ansible_hostname }}.csr
     privatekey_path: /epic/certs/keys/private.key
     common_name: '{{ ansible_fqdn }}'
@@ -376,7 +376,7 @@
     subject_alt_name: "{{ dnsnames | map('regex_replace', '^', 'DNS:') | list }}"
 
 - name: check for chrony.conf
-  stat:
+  ansible.builtin.stat:
     path: /etc/chrony.conf
   register: chrony_conf_stat
   changed_when: false
@@ -385,17 +385,17 @@
 - name: update chrony config
   block:
     - name: disable makestep
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/chrony.conf
         regexp: 'makestep'
         line: '#makestep 2'
     - name: set minsources to 2
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/chrony.conf
         regexp: '^minsources'
         line: 'minsources 2'
     - name: set logchange to 0.5
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/chrony.conf
         regexp: '^logchange'
         line: 'logchange 0.5'
