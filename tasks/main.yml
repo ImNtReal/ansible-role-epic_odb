@@ -17,30 +17,157 @@
     createhome: true
     name: "{{ item['user'] }}"
     comment: "{{ item['comment'] }}"
-    ansible.builtin.group: "{{ item['group'] }}"
+    group: "{{ item['group'] }}"
     groups: "{{ item['groups'] }}"
     uid: "{{ item['uid'] }}"
     state: "{{ item['state'] }}"
     password: "{{ item['password'] }}"
   loop: "{{ epic_users }}"
 
+
+### Install required packages
+- name: ensure packges needed for Epic and role are installed
+  ansible.builtin.yum:
+    name:
+      - perl-core
+      - perl-CGI
+      - perl-XML-Simple
+      - ksh
+      - sysstat
+      - psmisc
+      - cifs-utils
+      - openssh-server
+      - firewalld
+      - pyOpenSSL
+      - python2-cryptography
+      - net-tools
+      - lsscsi
+      - virt-what
+      - chrony
+      - iperf3
+      - patch
+      - gcc
+      - gdb
+      - lsof
+      - strace
+      - tmux
+      - perf
+      - dstat
+    state: present
+  when: ansible_facts['distribution_major_version'] < '8'
+
+- name: ensure packges needed for Epic and role are installed
+  ansible.builtin.dnf:
+    name:
+      - perl-core
+      - perl-CGI
+      - perl-XML-Simple
+      - ksh
+      - sysstat
+      - psmisc
+      - cifs-utils
+      - openssh-server
+      - firewalld
+      - pyOpenSSL
+      - python2-cryptography
+      - net-tools
+      - lsscsi
+      - virt-what
+      - chrony
+      - iperf3
+      - patch
+      - gcc
+      - gdb
+      - lsof
+      - strace
+      - tmux
+      - perf
+      - pcp-system-tools
+      - bcc-tools
+    state: present
+  when: ansible_facts['distribution_major_version'] > '7'
+
+### Post package install tasks
+- name: gather package facts
+  package_facts:
+
 ### systemd tweaks
 - name: load service facts
   service_facts:
 
-- name: stop and disable tuned
-  ansible.builtin.service:
-    name: tuned
-    state: stopped
-    enabled: false
-  when: ansible_facts['services']['tuned.service'] is defined
+- block:
+  - name: stop and disable tuned
+    ansible.builtin.service:
+      name: tuned
+      state: stopped
+      enabled: false
+    when: ansible_facts['services']['tuned.service'] is defined
+
+  ### Security limits and sysctl config options
+  - name: configure security limits
+    ansible.builtin.copy:
+      src: limits
+      dest: /etc/security/limits.d/99-epic.conf
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: check and config sysctl
+    include: sysctl.yml
+    loop:
+      - {name: vm.hugetlb_shm_group, value: 10000}
+      - {name: vm.swappiness, value: 1}
+      - {name: vm.dirty_expire_centisecs, value: 200}
+      - {name: vm.dirty_writeback_centisecs, value: 50}
+      - {name: kernel.pid_max, value: 4000000}
+      - {name: kernel.shmmax, value: 2199023255552}
+      - {name: kernel.msgmnb, value: 65536}
+      - {name: kernel.core_pattern, value: /epic_core/%e.%h.%p.%t.dump}
+      - {name: kernel.sem, value: 250 1024000000 500 32000}
+      - {name: kernel.numa_balancing, value: 0}
+      - {name: fs.file-max, value: 1000000000}
+      - {name: fs.aio-max-nr, value: 524288}
+      - {name: net.core.rmem_max, value: 33554432}
+      - {name: net.core.wmem_max, value: 33554432}
+      - {name: net.core.netdev_max_backlog, value: 300000}
+      - {name: net.ipv4.tcp_rmem, value: 4096 87380 33554432}
+      - {name: net.ipv4.tcp_wmem, value: 4096 65536 33554432}
+      - {name: net.ipv4.tcp_keepalive_time, value: 600}
+      - {name: net.ipv4.tcp_keepalive_intvl, value: 60}
+
+  - name: configure hugepage size
+    ansible.posix.sysctl:
+      name: vm.nr_hugepages
+      value: "{{ nr_hugepages }}"
+      sysctl_file: /etc/sysctl.d/99-epic.conf
+      sysctl_set: true
+      state: present
+    when: nr_hugepages is defined
+
+  - name: disable alt+ctrl+del
+    ansible.builtin.file:
+      src: /dev/null
+      dest: /etc/systemd/system/ctrl-alt-del.target
+      state: link
+
+  - name: add grub options
+    ansible.builtin.copy:
+      src: grub
+      dest: /etc/default/grub
+      owner: root
+      group: root
+      mode: 0644
+    notify: grub-mkconfig
+    when: "'grub' in ansible_facts['packages']"
+
+  when: not epic_tuned
 
 - name: install service files
   ansible.builtin.copy:
     src: "{{ item }}.service"
     dest: /etc/systemd/system/{{ item }}.service
     owner: root
-    ansible.builtin.group: root
+    group: root
     mode: 0664
   loop:
     - epic@
@@ -58,91 +185,21 @@
     name: redalert
     enabled: true
 
-- name: disable alt+ctrl+del
-  ansible.builtin.file:
-    src: /dev/null
-    dest: /etc/systemd/system/ctrl-alt-del.target
-    state: link
-
-### Security limits and sysctl config options
-- name: configure security limits
-  ansible.builtin.copy:
-    src: limits
-    dest: /etc/security/limits.d/99-epic.conf
-    owner: root
-    ansible.builtin.group: root
-    mode: 0644
-
-- name: check and config sysctl
-  include: sysctl.yml
-  loop:
-    - {name: vm.hugetlb_shm_group, value: 10000}
-    - {name: vm.swappiness, value: 1}
-    - {name: vm.dirty_expire_centisecs, value: 200}
-    - {name: vm.dirty_writeback_centisecs, value: 50}
-    - {name: kernel.pid_max, value: 4000000}
-    - {name: kernel.shmmax, value: 2199023255552}
-    - {name: kernel.msgmnb, value: 65536}
-    - {name: kernel.core_pattern, value: /epic_core/%e.%h.%p.%t.dump}
-    - {name: kernel.sem, value: 250 1024000000 500 32000}
-    - {name: kernel.numa_balancing, value: 0}
-    - {name: fs.file-max, value: 1000000000}
-    - {name: fs.aio-max-nr, value: 524288}
-    - {name: net.core.rmem_max, value: 33554432}
-    - {name: net.core.wmem_max, value: 33554432}
-    - {name: net.core.netdev_max_backlog, value: 300000}
-    - {name: net.ipv4.tcp_rmem, value: 4096 87380 33554432}
-    - {name: net.ipv4.tcp_wmem, value: 4096 65536 33554432}
-    - {name: net.ipv4.tcp_keepalive_time, value: 600}
-    - {name: net.ipv4.tcp_keepalive_intvl, value: 60}
-
-- name: configure hugepage size
-  ansible.posix.sysctl:
-    name: vm.nr_hugepages
-    value: "{{ nr_hugepages }}"
-    sysctl_file: /etc/sysctl.d/99-epic.conf
-    sysctl_set: true
-    state: present
-  when: nr_hugepages is defined
-
-### Install required packages
-- name: ensure packges needed for Epic and role are installed
-  ansible.builtin.yum:
-    name:
-      - perl-core
-      - perl-CGI
-      - perl-XML-Simple
-      - ksh
-      - sysstat
-      - psmisc
-      - cifs-utils
-      - openssh-server
-      - firewalld
-      - pyOpenSSL
-      - python2-cryptography
-    state: present
-
-### Post package install tasks
-- name: gather package facts
-  package_facts:
-
-- name: add grub options
-  ansible.builtin.copy:
-    src: grub
-    dest: /etc/default/grub
-    owner: root
-    ansible.builtin.group: root
-    mode: 0644
-  notify: grub-mkconfig
-  when: "'grub' in ansible_facts['packages']"
-
 ### Directory creation
+- name: create /usr/local/epic
+  ansible.builtin.file:
+    path: /usr/local/epic
+    state: directory
+    owner: epicadm
+    group: epicsys
+    mode: 0755
+
 - name: create Cache registration files directory
   ansible.builtin.file:
     path: /usr/local/etc/cachesys
     state: directory
     owner: root
-    ansible.builtin.group: root
+    group: root
     mode: 0755
 
 - name: create core dump directory
@@ -150,7 +207,7 @@
     path: /epic_core
     state: directory
     owner: epicadm
-    ansible.builtin.group: cachegrp
+    group: cachegrp
     mode: 0777
 
 - name: create epic directory
@@ -158,7 +215,7 @@
     path: /epic
     state: directory
     owner: epicadm
-    ansible.builtin.group: epicsys
+    group: epicsys
     mode: '2755'
 
 - name: create /epic/certs
@@ -166,7 +223,7 @@
     path: /epic/certs
     state: directory
     owner: epicadm
-    ansible.builtin.group: cachegrp
+    group: cachegrp
     mode: 0750
 
 - name: ensure encryption keys directory exists
@@ -174,7 +231,7 @@
     path: /epic/certs/keys
     state: directory
     owner: epicadm
-    ansible.builtin.group: epicsys
+    group: epicsys
     mode: 0700
 
 ### Copy scripts and miscelaneous files
@@ -183,7 +240,7 @@
     src: CA.pem
     dest: /epic/certs/CA.pem
     owner: root
-    ansible.builtin.group: root
+    group: root
     mode: 0664
 
 - name: create /etc/ssh
@@ -235,7 +292,7 @@
     src: "{{ item }}"
     dest: /usr/local/bin/{{ item | basename }}
     owner: root
-    ansible.builtin.group: root
+    group: root
     mode: 0755
   with_fileglob: localbin/*
 
@@ -244,7 +301,7 @@
     src: manage_epicuser_group.j2
     dest: /usr/local/bin/manage_epicuser_group
     owner: root
-    ansible.builtin.group: root
+    group: root
     mode: 0775
 
 - name: add cron job for manage_epicuser_group
@@ -273,7 +330,7 @@
     src: sudoers
     dest: /etc/sudoers.d/epic
     owner: root
-    ansible.builtin.group: root
+    group: root
     mode: 0440
 
 - name: create working copy of system sudoers file
@@ -361,18 +418,18 @@
   community.crypto.openssl_privatekey:
     path: /epic/certs/keys/private.key
     owner: epicadm
-    ansible.builtin.group: epicsys
+    group: epicsys
 
 - name: Generate CSR
   community.crypto.openssl_csr:
     path: /epic/certs/{{ ansible_hostname }}.csr
     privatekey_path: /epic/certs/keys/private.key
     common_name: '{{ ansible_fqdn }}'
-    organizational_unit_name: IT Dept.
-    organization_name: Northeast Georgia Health System
-    locality_name: Gainesville
-    state_or_province_name: Georgia
-    country_name: US
+    organizational_unit_name: "{{ epic_csr['ou'] }}"
+    organization_name: "{{ epic_csr['o'] }}"
+    locality_name: "{{ epic_csr['l'] }}"
+    state_or_province_name: "{{ epic_csr['s'] }}"
+    country_name: "{{ epic_csr['c'] }}"
     subject_alt_name: "{{ dnsnames | map('regex_replace', '^', 'DNS:') | list }}"
 
 - name: check for chrony.conf
