@@ -391,7 +391,7 @@
 
 - name: enable dynamic Epic firewall rules
   ansible.posix.firewalld:
-    ansible.builtin.service: "{{ item['name'] }}"
+    service: "{{ item['name'] }}"
     permanent: true
     immediate: true
     state: enabled

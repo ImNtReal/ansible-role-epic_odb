@@ -1,12 +1,15 @@
 ---
 - name: set epic_firewall_short
-  ansible.builtin.set_fact: epic_firewall_short="{{ item['name'] }}"
+  ansible.builtin.set_fact:
+    epic_firewall_short: "{{ item['name'] }}"
 
 - name: set epic_firewall_description
-  ansible.builtin.set_fact: epic_firewall_description="{{ item['description'] }}"
+  ansible.builtin.set_fact:
+    epic_firewall_description: "{{ item['description'] }}"
 
 - name: set epic_firewall_ports
-  ansible.builtin.set_fact: epic_firewall_ports="{{ item['ports'] }}"
+  ansible.builtin.set_fact:
+    epic_firewall_ports: "{{ item['ports'] }}"
 
 - name: copy {{ epic_firewall_short }} firewall rule
   ansible.builtin.template:
