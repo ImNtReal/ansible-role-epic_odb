@@ -68,8 +68,6 @@
       - cifs-utils
       - openssh-server
       - firewalld
-      - pyOpenSSL
-      - python2-cryptography
       - net-tools
       - lsscsi
       - virt-what
