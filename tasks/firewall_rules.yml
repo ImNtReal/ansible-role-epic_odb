@@ -13,5 +13,5 @@
     src: firewalld.xml.j2
     dest: /etc/firewalld/services/{{ epic_firewall_short }}.xml
     owner: root
-    ansible.builtin.group: root
+    group: root
     mode: 0660
