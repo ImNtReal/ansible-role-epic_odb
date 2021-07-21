@@ -218,13 +218,21 @@
     group: epicsys
     mode: '2755'
 
+- name: create /epic/tmp directory
+  ansible.builtin.file:
+    path: /epic/tmp
+    state: directory
+    owner: epicadm
+    group: epicuser
+    mode: '1777'
+
 - name: create /epic/certs
   ansible.builtin.file:
     path: /epic/certs
     state: directory
     owner: epicadm
     group: cachegrp
-    mode: 0750
+    mode: 0755
 
 - name: ensure encryption keys directory exists
   ansible.builtin.file:
@@ -232,16 +240,16 @@
     state: directory
     owner: epicadm
     group: epicsys
-    mode: 0700
+    mode: 0755
 
 ### Copy scripts and miscelaneous files
 - name: copy CA certs
   ansible.builtin.copy:
     src: CA.pem
     dest: /epic/certs/CA.pem
-    owner: root
-    group: root
-    mode: 0664
+    owner: epicadm
+    group: epicsys
+    mode: 0644
 
 - name: create /etc/ssh
   ansible.builtin.file:
