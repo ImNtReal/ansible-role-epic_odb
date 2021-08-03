@@ -169,7 +169,7 @@
       group: root
       mode: 0644
     notify: grub-mkconfig
-    when: "'grub' in ansible_facts['packages']"
+    when: "'grub2-common' in ansible_facts['packages']"
 
   - name: configure tuned
     ansible.builtin.lineinfile:
