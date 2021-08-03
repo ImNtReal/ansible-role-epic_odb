@@ -160,6 +160,25 @@
 
   when: not epic_tuned
 
+- block:
+  - name: add grub options
+    ansible.builtin.copy:
+      src: grub
+      dest: /etc/default/grub
+      owner: root
+      group: root
+      mode: 0644
+    notify: grub-mkconfig
+    when: "'grub' in ansible_facts['packages']"
+
+  - name: configure tuned
+    ansible.builtin.lineinfile:
+      path: /etc/tuned/epic/tuned.conf
+      line: vm.hugetlb_shm_group = 10000
+      regexp: '^vm.hugetlb_shm_group'
+      insertafter: '^[sysctl]$'
+  when: epic_tuned
+
 - name: install service files
   ansible.builtin.copy:
     src: "{{ item }}.service"
@@ -253,6 +272,13 @@
   ansible.builtin.file:
     path: /etc/ssh
     state: directory
+
+- name: disable root login over SSH
+  ansible.builtin.lineinfile:
+    line: PermitRootLogin no
+    regexp: '^PermitRootLogin'
+    path: /etc/ssh/sshd_config
+  notify: restart_sshd
 
 - name: set sshd to listen on port 2222
   ansible.builtin.lineinfile:
