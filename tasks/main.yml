@@ -278,6 +278,15 @@
   changed_when: False
   when: ra_conf_file_stat['stat']['exists']
 
+- name: get contents of ESMP_TRUSTED_DIR
+  find:
+    paths: "{{ esmp_trusted_dir['stdout'] }}"
+    pattern: '*'
+  register: esmp_trusted_dir_files
+  when:
+    - ra_conf_file_stat
+    - esmp_trusted_dir['stdout']
+
 - name: copy CA certs
   ansible.builtin.copy:
     src: CA.pem
@@ -285,7 +294,9 @@
     owner: epicadm
     group: epicsys
     mode: 0644
-  notify: update_ra_cas
+  notify:
+    - Update RedAlert CAs
+    - Clear RedAlert CAs
 
 - name: create /etc/ssh
   ansible.builtin.file:
