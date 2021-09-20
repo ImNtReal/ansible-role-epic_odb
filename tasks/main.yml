@@ -289,7 +289,7 @@
 
 - name: copy CA certs
   ansible.builtin.copy:
-    src: CA.pem
+    src: "{{ ca_bundle }}"
     dest: /epic/certs/CA.pem
     owner: epicadm
     group: epicsys
