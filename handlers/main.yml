@@ -17,6 +17,7 @@
     state: restarted
 
 - name: update_ra_cas
-  command: /epic/redalert/bin/sslcert --trust /epic/certs/CA.pem
+  shell: rm -f {{ esmp_trusted_dir['stdout'] }}/* && /epic/redalert/bin/sslcert --trust /epic/certs/CA.pem
   become: true
   become_user: epicadm
+  when: sslcert_bin_stat['stat']['exists']

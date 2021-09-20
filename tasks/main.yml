@@ -260,6 +260,24 @@
     mode: 0755
 
 ### Copy scripts and miscelaneous files
+- name: check sslcert binary
+  ansible.builtin.stat:
+    path: /epic/redalert/bin/sslcert
+  register: sslcert_bin_stat
+
+- name: check RedAlert conf file
+  ansible.builtin.stat:
+    path: /epic/redalert/conf/epic.conf
+  register: ra_conf_file_stat
+
+- name: get ESMP_TRUSTED_DIR
+  shell: set -o pipefail &
+    grep '<ESMP_TRUSTED_DIR>' /epic/redalert/conf/epic.conf | cut -d '>' -f 2 | cut -d '<' -f 1
+  register: esmp_trusted_dir
+  check_mode: no
+  changed_when: False
+  when: ra_conf_file_stat['stat']['exists']
+
 - name: copy CA certs
   ansible.builtin.copy:
     src: CA.pem
