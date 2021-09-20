@@ -16,3 +16,7 @@
     name: vmtoolsd
     state: restarted
 
+- name: update_ra_cas
+  command: /epic/redalert/bin/sslcert --trust /epic/certs/CA.pem
+  become: true
+  become_user: epicadm

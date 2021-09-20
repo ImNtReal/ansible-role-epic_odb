@@ -267,6 +267,7 @@
     owner: epicadm
     group: epicsys
     mode: 0644
+  notify: update_ra_cas
 
 - name: create /etc/ssh
   ansible.builtin.file:
