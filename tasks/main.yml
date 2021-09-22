@@ -285,7 +285,7 @@
   register: esmp_trusted_dir_files
   when:
     - ra_conf_file_stat
-    - esmp_trusted_dir['stdout']
+    - esmp_trusted_dir['stdout'] | default('')
 
 - name: copy CA certs
   ansible.builtin.copy:
