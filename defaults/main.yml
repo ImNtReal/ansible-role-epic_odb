@@ -1,6 +1,4 @@
 ---
 useepicatservice: false
 
-epic_tuned: false
-
 ca_bundle: CA.pem
