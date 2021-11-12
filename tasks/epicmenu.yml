@@ -1,0 +1,42 @@
+- name: create conf directory
+  ansible.builtin.file:
+    path: /epic/{{ item['Environment'] | lower }}/conf
+    state: directory
+    owner: epicadm
+    group: epicuser
+    mode: 0755
+  tags:
+    - epicmenu
+
+- name: create bin directory
+  ansible.builtin.file:
+    path: /epic/{{ item['Environment'] | lower }}/bin
+    state: directory
+    owner: epicadm
+    group: epicuser
+    mode: 0755
+  tags:
+    - epicmenu
+
+- name: install epicmenu confs
+  ansible.builtin.template:
+    src: templates/emenv/{{ item | basename }}
+    dest: /epic/{{ item['Environment'] | lower }}/conf/{{ (item | basename | splitext)[0] }}
+    owner: epicadm
+    group: epicsys
+    mode: 0644
+    backup: true
+  with_fileglob: templates/epicmenu/*
+  tags:
+    - epicmenu
+
+- name: ensure links exists for epicmenus
+  ansible.builtin.file:
+    path: /epic/{{ item['Environment'] | lower }}/bin/{{ ((item | basename | splitext)[0] | splitext)[0] }}
+    src: epicmenu
+    state: link
+    force: true
+  when: ((item | basename | splitext)[0] | splitext)[0] != 'epicmenu'
+  with_fileglob: templates/epicmenu/*
+  tags:
+    - epicmenu
