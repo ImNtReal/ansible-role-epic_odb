@@ -20,7 +20,7 @@
 
 - name: install epicmenu confs
   ansible.builtin.template:
-    src: templates/emenv/{{ ((item | basename | splitext)[0] | splitext)[0] }}
+    src: templates/emenv/{{ ((item | basename | splitext)[0] | splitext)[0] }}.conf.j2
     dest: /epic/{{ EpicEnvironment['Environment'] | lower }}/conf/{{ item }}
     owner: epicadm
     group: epicsys
