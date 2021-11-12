@@ -36,7 +36,7 @@
     src: epicmenu
     state: link
     force: true
-  when: ((EpicEnvironment | basename | splitext)[0] | splitext)[0] != 'epicmenu'
+  when: ((EpicEnvironment['Environment'] | basename | splitext)[0] | splitext)[0] != 'epicmenu'
   with_fileglob: templates/epicmenu/*
   tags:
     - epicmenu
