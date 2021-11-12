@@ -567,5 +567,7 @@
 - name: install environment epicmenus
   include_tasks: epicmenu.yml
   loop: "{{ EpicEnvironments }}"
+  loop_control:
+    loop_var: EpicEnvironment
   tags:
     - epicmenu
