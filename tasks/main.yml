@@ -563,3 +563,7 @@
   with_fileglob: templates/epicmenu/*
   tags:
     - epicmenu
+
+- name: install environment epicmenus
+  include_tasks: epicmenu.yml
+  loop: "{{ EpicEnvironments }}"
