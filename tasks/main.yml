@@ -248,7 +248,7 @@
     path: /epic/certs
     state: directory
     owner: epicadm
-    group: cachegrp
+    group: epicsys
     mode: 0755
 
 - name: ensure encryption keys directory exists
@@ -257,7 +257,7 @@
     state: directory
     owner: epicadm
     group: epicsys
-    mode: 0755
+    mode: 0700
 
 ### Copy scripts and miscelaneous files
 - name: check sslcert binary
