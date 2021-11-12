@@ -20,7 +20,7 @@
 
 - name: install epicmenu confs
   ansible.builtin.template:
-    src: templates/emenv/{{ item | basename | splitext)[0] | splitext)[0] }}
+    src: templates/emenv/{{ ((item | basename | splitext)[0] | splitext)[0] }}
     dest: /epic/{{ EpicEnvironment['Environment'] | lower }}/conf/{{ item }}
     owner: epicadm
     group: epicsys
@@ -32,7 +32,7 @@
 
 - name: ensure links exists for epicmenus
   ansible.builtin.file:
-    path: /epic/{{ EpicEnvironment['Environment'] | lower }}/bin/{{ item | basename | splitext)[0] | splitext)[0] }}
+    path: /epic/{{ EpicEnvironment['Environment'] | lower }}/bin/{{ ((item | basename | splitext)[0] | splitext)[0] }}
     src: epicmenu
     state: link
     force: true
