@@ -6,8 +6,6 @@ RequiresOverridable=ntpd.service
 After=local-fs.target ISCAgent.service
 Wants=ISCAgent.service
 RequiresMountsFor=/epic
-Wants=ISCAgent.service
-RequiresMountsFor=/epic
 
 [Service]
 Type=forking
