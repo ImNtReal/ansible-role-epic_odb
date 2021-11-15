@@ -9,8 +9,8 @@ RequiresMountsFor=/epic
 
 [Service]
 Type=forking
-ExecStart=/epic/%i/bin/runlevel -r u
-ExecStop=/epic/%i/bin/runlevel -r c
+ExecStart=/bin/perl /epic/%i/bin/runlevel -r u
+ExecStop=/bin/perl /epic/%i/bin/runlevel -r c
 RemainAfterExit=yes
 Restart=no
 
