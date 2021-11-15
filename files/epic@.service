@@ -3,7 +3,11 @@ Description=Starts the IRIS/Cache database and Epic daemons for %I.
 ConditionFileIsExecutable=/epic/%i/bin/runlevel
 ConditionFileIsExecutable=/epic/%i/bin/runlevel
 RequiresOverridable=ntpd.service
-After=ntpd.service local-fs.target
+After=local-fs.target ISCAgent.service
+Wants=ISCAgent.service
+RequiresMountsFor=/epic
+Wants=ISCAgent.service
+RequiresMountsFor=/epic
 
 [Service]
 Type=forking
