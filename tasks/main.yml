@@ -158,6 +158,14 @@
     notify: grub-mkconfig
     when: "'grub' in ansible_facts['packages']"
 
+  - name: copy Epic sudoers file
+    ansible.builtin.copy:
+      src: sudoers
+      dest: /etc/sudoers.d/epic
+      owner: root
+      group: root
+      mode: 0440
+
   when: ansible_facts['distribution_major_version'] < '8'
 
 - block:
@@ -387,14 +395,6 @@
   when: "'audit' in ansible_facts['packages']"
 
 ### Sudoers config
-- name: copy Epic sudoers file
-  ansible.builtin.copy:
-    src: sudoers
-    dest: /etc/sudoers.d/epic
-    owner: root
-    group: root
-    mode: 0440
-
 - name: create working copy of system sudoers file
   command: cp -f /etc/sudoers /etc/sudoers.tmp
   changed_when: false

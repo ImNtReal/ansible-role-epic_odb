@@ -1,5 +1,5 @@
 [Unit]
-Description=Starts the Cache database and Epic daemons for %I.
+Description=Starts the IRIS/Cache database and Epic daemons for %I.
 ConditionFileIsExecutable=/epic/%i/bin/runlevel
 ConditionFileIsExecutable=/epic/%i/bin/runlevel
 RequiresOverridable=ntpd.service
@@ -7,9 +7,8 @@ After=ntpd.service local-fs.target
 
 [Service]
 Type=forking
-ExecStart=/usr/local/bin/instctl %i start
-ExecStop=/usr/local/bin/instctl %i stop
-PIDFile=/epic/%i/cachesys/control.pid
+ExecStart=/epic/%i/bin/runlevel -r u
+ExecStop=/epic/%i/bin/runlevel -r c
 RemainAfterExit=yes
 Restart=no
 
