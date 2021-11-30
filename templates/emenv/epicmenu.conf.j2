@@ -6,7 +6,7 @@
 <Analyst Tools>
 <CLARITYEXPORT>
 <APPLICATION>CRPACK</APPLICATION>
-<CONFIG_DIR>/epic/{{ EpicEnvironment['Environment'] | lower }}/conf</CONFIG_DIR>
+<CONFIG_DIR>/epic/{{ EpicEnvironment['Instance'] | lower }}/conf</CONFIG_DIR>
 <ENABLE_LINKABLE_TEMPLATES>0</ENABLE_LINKABLE_TEMPLATES>
 <ENVIRONMENT>{{ EpicEnvironment['Environment'] }}</ENVIRONMENT>
 <INSTANCE>{{ EpicEnvironment['Instance'] }}</INSTANCE>
@@ -17,7 +17,7 @@
 </CLARITYEXPORT>
 <EXPORTCATEGORIES>
 <APPLICATION>EACATOUT</APPLICATION>
-<CONFIG_DIR>/epic/{{ EpicEnvironment['Environment'] | lower }}/conf</CONFIG_DIR>
+<CONFIG_DIR>/epic/{{ EpicEnvironment['Instance'] | lower }}/conf</CONFIG_DIR>
 <ENABLE_LINKABLE_TEMPLATES>0</ENABLE_LINKABLE_TEMPLATES>
 <ENVIRONMENT>{{ EpicEnvironment['Environment'] }}</ENVIRONMENT>
 <INSTANCE>{{ EpicEnvironment['Instance'] }}</INSTANCE>
@@ -28,7 +28,7 @@
 </EXPORTCATEGORIES>
 <EXPORTRECORDS>
 <APPLICATION>main^JXPORT</APPLICATION>
-<CONFIG_DIR>/epic/{{ EpicEnvironment['Environment'] | lower }}/conf</CONFIG_DIR>
+<CONFIG_DIR>/epic/{{ EpicEnvironment['Instance'] | lower }}/conf</CONFIG_DIR>
 <ENABLE_LINKABLE_TEMPLATES>0</ENABLE_LINKABLE_TEMPLATES>
 <ENVIRONMENT>{{ EpicEnvironment['Environment'] }}</ENVIRONMENT>
 <INSTANCE>{{ EpicEnvironment['Instance'] }}</INSTANCE>
@@ -39,7 +39,7 @@
 </EXPORTRECORDS>
 <GENERATEIMPORTSPREADSHEET>
 <APPLICATION>JXPORT</APPLICATION>
-<CONFIG_DIR>/epic/{{ EpicEnvironment['Environment'] | lower }}/conf</CONFIG_DIR>
+<CONFIG_DIR>/epic/{{ EpicEnvironment['Instance'] | lower }}/conf</CONFIG_DIR>
 <ENABLE_LINKABLE_TEMPLATES>0</ENABLE_LINKABLE_TEMPLATES>
 <ENVIRONMENT>{{ EpicEnvironment['Environment'] }}</ENVIRONMENT>
 <INSTANCE>{{ EpicEnvironment['Instance'] }}</INSTANCE>
@@ -50,7 +50,7 @@
 </GENERATEIMPORTSPREADSHEET>
 <IMPORTCATEGORIES>
 <APPLICATION>EACATIN</APPLICATION>
-<CONFIG_DIR>/epic/{{ EpicEnvironment['Environment'] | lower }}/conf</CONFIG_DIR>
+<CONFIG_DIR>/epic/{{ EpicEnvironment['Instance'] | lower }}/conf</CONFIG_DIR>
 <ENABLE_LINKABLE_TEMPLATES>0</ENABLE_LINKABLE_TEMPLATES>
 <ENVIRONMENT>{{ EpicEnvironment['Environment'] }}</ENVIRONMENT>
 <INSTANCE>{{ EpicEnvironment['Instance'] }}</INSTANCE>
@@ -61,7 +61,7 @@
 </IMPORTCATEGORIES>
 <RICHTEXTCONTENTREVIEW>
 <APPLICATION>CIRPT</APPLICATION>
-<CONFIG_DIR>/epic/{{ EpicEnvironment['Environment'] | lower }}/conf</CONFIG_DIR>
+<CONFIG_DIR>/epic/{{ EpicEnvironment['Instance'] | lower }}/conf</CONFIG_DIR>
 <ENABLE_LINKABLE_TEMPLATES>0</ENABLE_LINKABLE_TEMPLATES>
 <ENVIRONMENT>{{ EpicEnvironment['Environment'] }}</ENVIRONMENT>
 <INSTANCE>{{ EpicEnvironment['Instance'] }}</INSTANCE>
@@ -72,7 +72,7 @@
 </RICHTEXTCONTENTREVIEW>
 <ROUTERREPOSTUTILITY>
 <APPLICATION>RepostUtil^KECRUTL16()</APPLICATION>
-<CONFIG_DIR>/epic/{{ EpicEnvironment['Environment'] | lower }}/conf</CONFIG_DIR>
+<CONFIG_DIR>/epic/{{ EpicEnvironment['Instance'] | lower }}/conf</CONFIG_DIR>
 <ENABLE_LINKABLE_TEMPLATES>0</ENABLE_LINKABLE_TEMPLATES>
 <ENVIRONMENT>{{ EpicEnvironment['Environment'] }}</ENVIRONMENT>
 <INSTANCE>{{ EpicEnvironment['Instance'] }}</INSTANCE>
@@ -83,7 +83,7 @@
 </ROUTERREPOSTUTILITY>
 <TESTINGTOOLMENU>
 <APPLICATION>JATMENU</APPLICATION>
-<CONFIG_DIR>/epic/{{ EpicEnvironment['Environment'] | lower }}/conf</CONFIG_DIR>
+<CONFIG_DIR>/epic/{{ EpicEnvironment['Instance'] | lower }}/conf</CONFIG_DIR>
 <ENABLE_LINKABLE_TEMPLATES>0</ENABLE_LINKABLE_TEMPLATES>
 <ENVIRONMENT>{{ EpicEnvironment['Environment'] }}</ENVIRONMENT>
 <INSTANCE>{{ EpicEnvironment['Instance'] }}</INSTANCE>
@@ -94,7 +94,7 @@
 </TESTINGTOOLMENU>
 <VIEWCATEGORIES>
 <APPLICATION>EACATVW</APPLICATION>
-<CONFIG_DIR>/epic/{{ EpicEnvironment['Environment'] | lower }}/conf</CONFIG_DIR>
+<CONFIG_DIR>/epic/{{ EpicEnvironment['Instance'] | lower }}/conf</CONFIG_DIR>
 <ENABLE_LINKABLE_TEMPLATES>0</ENABLE_LINKABLE_TEMPLATES>
 <ENVIRONMENT>{{ EpicEnvironment['Environment'] }}</ENVIRONMENT>
 <INSTANCE>{{ EpicEnvironment['Instance'] }}</INSTANCE>
@@ -105,7 +105,7 @@
 </VIEWCATEGORIES>
 <VIEWFLOWSHEETINFO>
 <APPLICATION>JEDFLOHP</APPLICATION>
-<CONFIG_DIR>/epic/{{ EpicEnvironment['Environment'] | lower }}/conf</CONFIG_DIR>
+<CONFIG_DIR>/epic/{{ EpicEnvironment['Instance'] | lower }}/conf</CONFIG_DIR>
 <ENABLE_LINKABLE_TEMPLATES>0</ENABLE_LINKABLE_TEMPLATES>
 <ENVIRONMENT>{{ EpicEnvironment['Environment'] }}</ENVIRONMENT>
 <INSTANCE>{{ EpicEnvironment['Instance'] }}</INSTANCE>
@@ -116,7 +116,7 @@
 </VIEWFLOWSHEETINFO>
 <VIEWRECORDS>
 <APPLICATION>all^EAVIEWID</APPLICATION>
-<CONFIG_DIR>/epic/{{ EpicEnvironment['Environment'] | lower }}/conf</CONFIG_DIR>
+<CONFIG_DIR>/epic/{{ EpicEnvironment['Instance'] | lower }}/conf</CONFIG_DIR>
 <ENABLE_LINKABLE_TEMPLATES>0</ENABLE_LINKABLE_TEMPLATES>
 <ENVIRONMENT>{{ EpicEnvironment['Environment'] }}</ENVIRONMENT>
 <INSTANCE>{{ EpicEnvironment['Instance'] }}</INSTANCE>
@@ -127,7 +127,7 @@
 </VIEWRECORDS>
 <VIEWRULELOG>
 <APPLICATION>HWKSPRULELOG</APPLICATION>
-<CONFIG_DIR>/epic/{{ EpicEnvironment['Environment'] | lower }}/conf</CONFIG_DIR>
+<CONFIG_DIR>/epic/{{ EpicEnvironment['Instance'] | lower }}/conf</CONFIG_DIR>
 <ENABLE_LINKABLE_TEMPLATES>0</ENABLE_LINKABLE_TEMPLATES>
 <ENVIRONMENT>{{ EpicEnvironment['Environment'] }}</ENVIRONMENT>
 <INSTANCE>{{ EpicEnvironment['Instance'] }}</INSTANCE>
@@ -140,7 +140,7 @@
 <MAIN>
 <APPLICATION ACCESS MENU>
 <APPLICATION>EPIC</APPLICATION>
-<CONFIG_DIR>/epic/{{ EpicEnvironment['Environment'] | lower }}/conf</CONFIG_DIR>
+<CONFIG_DIR>/epic/{{ EpicEnvironment['Instance'] | lower }}/conf</CONFIG_DIR>
 <ENVIRONMENT>{{ EpicEnvironment['Environment'] }}</ENVIRONMENT>
 <INSTANCE>{{ EpicEnvironment['Instance'] }}</INSTANCE>
 <NAME> Application Access Menu</NAME>
@@ -157,7 +157,7 @@
 </Analyst Tools>
 <EPIC UTILITIES>
 <APPLICATION>EPICUTILS</APPLICATION>
-<CONFIG_DIR>/epic/{{ EpicEnvironment['Environment'] | lower }}/conf</CONFIG_DIR>
+<CONFIG_DIR>/epic/{{ EpicEnvironment['Instance'] | lower }}/conf</CONFIG_DIR>
 <ENVIRONMENT>{{ EpicEnvironment['Environment'] }}</ENVIRONMENT>
 <INSTANCE>{{ EpicEnvironment['Instance'] }}</INSTANCE>
 <NAME> Epic Utilities</NAME>
@@ -167,7 +167,7 @@
 </EPIC UTILITIES>
 <HYPERSPACE CONFIGURATION>
 <APPLICATION>EDTop</APPLICATION>
-<CONFIG_DIR>/epic/{{ EpicEnvironment['Environment'] | lower }}/conf</CONFIG_DIR>
+<CONFIG_DIR>/epic/{{ EpicEnvironment['Instance'] | lower }}/conf</CONFIG_DIR>
 <ENVIRONMENT>{{ EpicEnvironment['Environment'] }}</ENVIRONMENT>
 <INSTANCE>{{ EpicEnvironment['Instance'] }}</INSTANCE>
 <NAME> Hyperspace Configuration</NAME>
@@ -177,7 +177,7 @@
 </HYPERSPACE CONFIGURATION>
 <LOOKIT>
 <APPLICATION>^%ZeW</APPLICATION>
-<CONFIG_DIR>/epic/{{ EpicEnvironment['Environment'] | lower }}/conf</CONFIG_DIR>
+<CONFIG_DIR>/epic/{{ EpicEnvironment['Instance'] | lower }}/conf</CONFIG_DIR>
 <ENABLE_LINKABLE_TEMPLATES>1</ENABLE_LINKABLE_TEMPLATES>
 <ENVIRONMENT>{{ EpicEnvironment['Environment'] }}</ENVIRONMENT>
 <INSTANCE>{{ EpicEnvironment['Instance'] }}</INSTANCE>
