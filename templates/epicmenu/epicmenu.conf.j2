@@ -5,13 +5,13 @@
 <MAIN>
 {% set ns = namespace(order=0) %}
 {% for EpicEnvironment in EpicEnvironments %}
-<{{ EpicEnvironment['Environment'] }}>
+<{{ EpicEnvironment['Instance'] }}>
 <COMMAND>/epic/{{ EpicEnvironment['Instance'] | lower }}/bin/epicmenu</COMMAND>
-<NAME>{{ EpicEnvironment['Environment'] }}</NAME>
+<NAME>{{ EpicEnvironment['Instance'] }}</NAME>
 <ORDER>{{ loop.index }}</ORDER>
-<SHORTCUT>{{ EpicEnvironment['Environment'] }}</SHORTCUT>
+<SHORTCUT>{{ EpicEnvironment['Instance'] }}</SHORTCUT>
 <TYPE>COMMAND</TYPE>
-</{{ EpicEnvironment['Environment'] }}>
+</{{ EpicEnvironment['Instance'] }}>
 {% set ns.order = loop.index + 1 %}
 {% endfor %}
 </MAIN>
