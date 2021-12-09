@@ -20,8 +20,13 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 instance="$1"
-if ccontrol qlist "$instance" &> /dev/null; then # Make sure instance is valid
+if ccontrol qlist "$instance" &> /dev/null; then # Check if instance is valid Cache'
   directory=$(ccontrol qlist "$instance" | cut -d '^' -f 2)
+  inst_path=$(echo "$directory" | awk -F '/' 'NF{NF-=1}1' OFS='/')
+  data_path=$("${inst_path}/bin/managedb" --report name="$instance" --parsable | tail -n 1 | awk -F '/' 'NF{NF-=2}1' OFS='/')
+  lv=$(findmnt -n -o SOURCE --target "$directory")
+elif iris qlist "$instance" &> /dev/null; then # Check if instance is valid IRIS
+  directory=$(iris qlist "$instance" | cut -d '^' -f 2)
   inst_path=$(echo "$directory" | awk -F '/' 'NF{NF-=1}1' OFS='/')
   data_path=$("${inst_path}/bin/managedb" --report name="$instance" --parsable | tail -n 1 | awk -F '/' 'NF{NF-=2}1' OFS='/')
   lv=$(findmnt -n -o SOURCE --target "$directory")

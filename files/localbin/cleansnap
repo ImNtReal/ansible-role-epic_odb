@@ -24,6 +24,12 @@ if ccontrol qlist "$instance" &> /dev/null; then # Make sure instance is valid
   instance_lv_name=$(lvs --noheadings -o lv_name "$instance_lv" | sed 's/ //g')
   lv=${instance_lv}_snap
   lv_name=${instance_lv_name}_snap
+elif iris qlist "$instance" &> /dev/null; then # Check if instance is valid IRIS
+  instance_path=$(iris qlist ${instance} | cut -d '^' -f 2 | rev | cut -d '/' -f 2- | rev)
+  instance_lv=$(findmnt -n -o SOURCE ${instance_path})
+  instance_lv_name=$(lvs --noheadings -o lv_name "$instance_lv" | sed 's/ //g')
+  lv=${instance_lv}_snap
+  lv_name=${instance_lv_name}_snap
 else
   echo "ERROR - Can't find instance ${instance}."
   exit 2

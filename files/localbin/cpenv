@@ -23,8 +23,8 @@ if [[ ! -d $src ]] || [[ ! -d $dst ]]; then
 fi
 
 cd $src
-for ds in $(find * -maxdepth 1 -type f -name CACHE.DAT -printf "%h\n" 2> /dev/null | egrep -v "$nojournal"); do
+for ds in $(find * -maxdepth 1 -type f \( -name CACHE.DAT -o -name IRIS.DAT \) 2> /dev/null | egrep -v "$nojournal"); do # Find all journaled data sets for the instance
 	echo "$ds" | cut -d '/' -f 1
-	mkdir -p "${dst}/${ds}"
-	pv "${ds}/CACHE.DAT" > "${dst}/${ds}/CACHE.DAT"
+	mkdir -p "${dst}/$(find $ds -printf "%h\n")"
+	pv "${ds}" > "${dst}/${ds}"
 done
