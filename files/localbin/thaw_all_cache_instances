@@ -4,7 +4,7 @@ set noclobber
 date
 fail=''
 
-if [[ which ccontrol &> /dev/null ]; then
+if [[ which ccontrol ]]; then
   for inst in $(ccontrol qlist | grep running | cut -d '^' -f 1 | tr [:upper:] [:lower:]); do
     if [[ -f "/epic/$inst/bin/instthaw" ]]; then
       "/epic/$inst/bin/instthaw"
@@ -22,7 +22,7 @@ if [[ which ccontrol &> /dev/null ]; then
   fi
 fi
 
-if [[ which iris &> /dev/null ]; then
+if [[ which iris ]]; then
   for inst in $(iris qlist | grep running | cut -d '^' -f 1 | tr [:upper:] [:lower:]); do
     if [[ -f "/epic/$inst/bin/instthaw" ]]; then
       "/epic/$inst/bin/instthaw"
