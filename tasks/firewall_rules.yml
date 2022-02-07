@@ -2,14 +2,20 @@
 - name: set epic_firewall_short
   ansible.builtin.set_fact:
     epic_firewall_short: "{{ item['name'] }}"
+  tags:
+    - firewall
 
 - name: set epic_firewall_description
   ansible.builtin.set_fact:
     epic_firewall_description: "{{ item['description'] }}"
+  tags:
+    - firewall
 
 - name: set epic_firewall_ports
   ansible.builtin.set_fact:
     epic_firewall_ports: "{{ item['ports'] }}"
+  tags:
+    - firewall
 
 - name: copy {{ epic_firewall_short }} firewall rule
   ansible.builtin.template:
@@ -18,3 +24,5 @@
     owner: root
     group: root
     mode: 0660
+  tags:
+    - firewall

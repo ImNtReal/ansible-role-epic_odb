@@ -55,6 +55,8 @@
       - dstat
     state: present
   when: ansible_facts['distribution_major_version'] < '8'
+  tags:
+    - firewall
 
 - name: ensure packges needed for Epic and role are installed
   ansible.builtin.dnf:
@@ -84,6 +86,8 @@
       - bcc-tools
     state: present
   when: ansible_facts['distribution_major_version'] > '7'
+  tags:
+    - firewall
 
 ### Post package install tasks
 - name: gather package facts
@@ -425,6 +429,8 @@
 ### Setup firewall rules
 - name: refresh service facts
   service_facts:
+  tags:
+    - firewall
 
 - name: start firewalld
   ansible.builtin.systemd:
@@ -432,18 +438,26 @@
     state: started
     enabled: true
   when: ansible_env['container'] is not defined
+  tags:
+    - firewall
 
 - name: Setup firewall rules
   include_tasks: firewall_rules.yml
   loop: "{{ odb_firewalld_services }}"
+  tags:
+    - firewall
 
 - name: refresh service facts
   service_facts:
+  tags:
+    - firewall
 
 - name: reload firewalld
   command: firewall-cmd --reload
   changed_when: false
   when: ansible_facts['services']['firewalld.service']['state'] == 'running'
+  tags:
+    - firewall
 
 - name: enable dynamic Epic firewall rules
   ansible.posix.firewalld:
@@ -453,6 +467,8 @@
     state: enabled
   loop: "{{ odb_firewalld_services }}"
   when: ansible_facts['services']['firewalld.service']['state'] == 'running'
+  tags:
+    - firewall
 
 - name: Enable SFTP port on firewall
   ansible.posix.firewalld:
@@ -460,6 +476,8 @@
     permanent: true
     state: enabled
   when: ansible_facts['services']['firewalld.service']['state'] == 'running'
+  tags:
+    - firewall
 
 ### Get status of /etc/vmware-tools before trying to copy file there
 - name: get status of /etc/vmware-tools directory
