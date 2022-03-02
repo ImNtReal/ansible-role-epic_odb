@@ -61,9 +61,7 @@
 - name: ensure packges needed for Epic and role are installed
   ansible.builtin.dnf:
     name:
-      - perl-core
-      - perl-CGI
-      - perl-XML-Simple
+      - perl
       - ksh
       - sysstat
       - psmisc
