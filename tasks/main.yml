@@ -268,7 +268,7 @@
     state: directory
     owner: epicadm
     group: epicsys
-    mode: 0700
+    mode: 0755
 
 ### Copy scripts and miscelaneous files
 - name: check sslcert binary
