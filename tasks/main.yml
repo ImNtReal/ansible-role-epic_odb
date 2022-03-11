@@ -309,6 +309,13 @@
     - Update RedAlert CAs
     - Clear RedAlert CAs
 
+- name: enable SSH on port 2222 in selinux
+  community.general.seport:
+    ports: 22, 2222
+    proto: tcp
+    setype: ssh_port_t
+    state: present
+
 - name: create /etc/ssh
   ansible.builtin.file:
     path: /etc/ssh
@@ -318,6 +325,13 @@
   ansible.builtin.lineinfile:
     line: PermitRootLogin no
     regexp: '^PermitRootLogin'
+    path: /etc/ssh/sshd_config
+  notify: restart_sshd
+
+- name: explicily enable port 22
+  ansible.builtin.lineinfile:
+    line: Port 22
+    regexp: '^Port 22$'
     path: /etc/ssh/sshd_config
   notify: restart_sshd
 
