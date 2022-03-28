@@ -298,6 +298,13 @@
     - ra_conf_file_stat
     - esmp_trusted_dir['stdout'] | default('')
 
+- name: check for CA bundle
+  ansible.builtin.stat:
+    path: files/{{ ca_bundle }}
+  register: ca_bundle_stat
+  changed_when: false
+  check_mode: false
+
 - name: copy CA certs
   ansible.builtin.copy:
     src: "{{ ca_bundle }}"
@@ -308,6 +315,7 @@
   notify:
     - Update RedAlert CAs
     - Clear RedAlert CAs
+  when: ca_bundle_stat['stat']['exists']
 
 - name: enable SSH on port 2222 in selinux
   community.general.seport:
