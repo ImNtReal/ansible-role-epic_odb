@@ -38,9 +38,9 @@
       - cifs-utils
       - openssh-server
       - firewalld
+      - policycoreutils-python
       - pyOpenSSL
       - python2-cryptography
-      - policycoreutils-python
       - net-tools
       - lsscsi
       - virt-what
@@ -76,6 +76,7 @@
       - iperf3
       - patch
       - policycoreutils-python
+      - python3-cryptography
       - gcc
       - gdb
       - lsof
