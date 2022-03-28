@@ -322,7 +322,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: 0755 # noqa risky-file-permissions
 
 - name: disable root login over SSH
   ansible.builtin.lineinfile:
@@ -509,7 +509,7 @@
     dest: /etc/vmware-tools/tools.conf
     owner: root
     group: root
-    mode: 0644
+    mode: 0644  # noqa risky-file-permissions
   when: etc_vmwaretools['stat']['exists']
   notify: restart_vmtools
 
