@@ -9,6 +9,9 @@
     epic_environments:
       - {Instance: 'PRD', Environment: 'PRD'}
 
+    dnsnames:
+      - epic-prd.example.com
+
     # nr_hugepages: 112763
 
     epic_passwords:
