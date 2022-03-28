@@ -1,10 +1,10 @@
 ---
 galaxy_info:
-  author: Jameson Pugh
+  author: imntreal
   description: Epic ODB Server Role
   company: NGHS
 
-  role_name: imntreal.epic_odb
+  role_name: epic_odb
 
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value
