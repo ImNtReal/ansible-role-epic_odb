@@ -1,6 +1,6 @@
 Ansible Role: Epic ODB
 ========
-[![Build Status](https://travis-ci.com/imntreal/ansible-role-epic_odb.svg?branch=master)](https://travis-ci.com/imntreal/ansible-epic_odb)
+![Build Status](https://github.com/ImNtReal/ansible-role-epic_odb/actions/workflows/main.yml/badge.svg)
 
 This role will prepare RHEL servers to act as Epic ODB servers.
 
