@@ -3,10 +3,10 @@
   hosts: all
 
   vars:
-    CacheInstances:
+    odb_instances:
       - 'prd'
 
-    EpicEnvironments:
+    epic_environments:
       - {Instance: 'PRD', Environment: 'PRD'}
 
     # nr_hugepages: 112763

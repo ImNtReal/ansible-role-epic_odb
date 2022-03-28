@@ -205,7 +205,7 @@
   ansible.builtin.systemd:
     name: epic@{{ item }}
     enabled: true
-  loop: "{{ CacheInstances }}"
+  loop: "{{ odb_instances }}"
   when: useepicatservice
 
 - name: enable redalert.service
@@ -320,6 +320,9 @@
   ansible.builtin.file:
     path: /etc/ssh
     state: directory
+    owner: root
+    group: root
+    mode: 0755
 
 - name: disable root login over SSH
   ansible.builtin.lineinfile:
@@ -504,6 +507,9 @@
   ansible.builtin.copy:
     src: tools.conf
     dest: /etc/vmware-tools/tools.conf
+    owner: root
+    group: root
+    mode: 0644
   when: etc_vmwaretools['stat']['exists']
   notify: restart_vmtools
 
@@ -597,7 +603,7 @@
 
 - name: install environment epicmenus
   include_tasks: epicmenu.yml
-  loop: "{{ EpicEnvironments }}"
+  loop: "{{ epic_environments }}"
   loop_control:
     loop_var: EpicEnvironment
   tags:

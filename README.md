@@ -22,8 +22,8 @@ Found in `vars/main.yml`:
 
 Variables set only in inventory:
 
-    CacheInstances: List of instances on server.
-    EpicEnvironments: List of Epic environments along with their respective instances
+    odb_instances: List of instances on server.
+    epic_environments: List of Epic environments along with their respective instances
     nr_hugepages: Number of hugepages
     firewalld_services: Definition of firewalld services to create
     epic_passwords: Password hashes for local accounts. Hashes for RHEL 7 can be
@@ -45,10 +45,10 @@ inventory:
     ---
     odb:
       epic-prd:
-        CacheInstances:
+        odb_instances:
           - 'prd'
 
-        EpicEnvironments:
+        epic_environments:
           - { Instance: 'PRD', Environment: 'PRD' }
 
         nr_hugepages: 112763

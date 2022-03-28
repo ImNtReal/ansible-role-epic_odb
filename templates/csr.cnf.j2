@@ -16,6 +16,6 @@ extendedKeyUsage = serverAuth, clientAuth
 subjectAltName = @alt_names
 [alt_names]
 DNS.1   = {{ ansible_fqdn }}
-{% for item in EpicEnvironments %}
+{% for item in epic_environments %}
 DNS.{{ loop['index'] + 1 }}   = epic-{{ item['Environment'] | lower }}.nghs.com
 {% endfor %}

@@ -4,7 +4,7 @@
     <MENU_DEF>
         <MAIN>
         {% set ns = namespace(order=0) %}
-        {% for EpicEnvironment in EpicEnvironments %}
+        {% for EpicEnvironment in epic_environments %}
             <{{ EpicEnvironment['Instance'] }}>
                 <COMMAND>/epic/{{ EpicEnvironment['Instance'] | lower }}/bin/epicmenu</COMMAND>
                 <NAME>{{ EpicEnvironment['Instance'] }}</NAME>
