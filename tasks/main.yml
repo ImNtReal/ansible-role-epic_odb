@@ -40,6 +40,7 @@
       - firewalld
       - pyOpenSSL
       - python2-cryptography
+      - policycoreutils-python
       - net-tools
       - lsscsi
       - virt-what
@@ -74,6 +75,7 @@
       - chrony
       - iperf3
       - patch
+      - policycoreutils-python
       - gcc
       - gdb
       - lsof
