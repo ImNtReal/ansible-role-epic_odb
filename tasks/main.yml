@@ -325,6 +325,7 @@
     proto: tcp
     setype: ssh_port_t
     state: present
+  when: ansible_facts['selinux']['status'] == 'enabled'
 
 - name: create /etc/ssh
   ansible.builtin.file:
