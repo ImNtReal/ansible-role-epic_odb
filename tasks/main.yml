@@ -97,97 +97,97 @@
   service_facts:
 
 - block:
-  - name: stop and disable tuned
-    ansible.builtin.service:
-      name: tuned
-      state: stopped
-      enabled: false
-    when: ansible_facts['services']['tuned.service'] is defined
+    - name: stop and disable tuned
+      ansible.builtin.service:
+        name: tuned
+        state: stopped
+        enabled: false
+      when: ansible_facts['services']['tuned.service'] is defined
 
-  ### Security limits and sysctl config options
-  - name: configure security limits
-    ansible.builtin.copy:
-      src: limits
-      dest: /etc/security/limits.d/99-epic.conf
-      owner: root
-      group: root
-      mode: 0644
+    ### Security limits and sysctl config options
+    - name: configure security limits
+      ansible.builtin.copy:
+        src: limits
+        dest: /etc/security/limits.d/99-epic.conf
+        owner: root
+        group: root
+        mode: 0644
 
-  - name: check and config sysctl
-    include: sysctl.yml
-    loop:
-      - {name: vm.hugetlb_shm_group, value: 10000}
-      - {name: vm.swappiness, value: 1}
-      - {name: vm.dirty_expire_centisecs, value: 200}
-      - {name: vm.dirty_writeback_centisecs, value: 50}
-      - {name: kernel.pid_max, value: 4000000}
-      - {name: kernel.shmmax, value: 2199023255552}
-      - {name: kernel.msgmnb, value: 65536}
-      - {name: kernel.core_pattern, value: /epic_core/%e.%h.%p.%t.dump}
-      - {name: kernel.sem, value: 250 1024000000 500 32000}
-      - {name: kernel.numa_balancing, value: 0}
-      - {name: fs.file-max, value: 1000000000}
-      - {name: fs.aio-max-nr, value: 524288}
-      - {name: net.core.rmem_max, value: 33554432}
-      - {name: net.core.wmem_max, value: 33554432}
-      - {name: net.core.netdev_max_backlog, value: 300000}
-      - {name: net.ipv4.tcp_rmem, value: 4096 87380 33554432}
-      - {name: net.ipv4.tcp_wmem, value: 4096 65536 33554432}
-      - {name: net.ipv4.tcp_keepalive_time, value: 600}
-      - {name: net.ipv4.tcp_keepalive_intvl, value: 60}
+    - name: check and config sysctl
+      include: sysctl.yml
+      loop:
+        - {name: vm.hugetlb_shm_group, value: 10000}
+        - {name: vm.swappiness, value: 1}
+        - {name: vm.dirty_expire_centisecs, value: 200}
+        - {name: vm.dirty_writeback_centisecs, value: 50}
+        - {name: kernel.pid_max, value: 4000000}
+        - {name: kernel.shmmax, value: 2199023255552}
+        - {name: kernel.msgmnb, value: 65536}
+        - {name: kernel.core_pattern, value: /epic_core/%e.%h.%p.%t.dump}
+        - {name: kernel.sem, value: 250 1024000000 500 32000}
+        - {name: kernel.numa_balancing, value: 0}
+        - {name: fs.file-max, value: 1000000000}
+        - {name: fs.aio-max-nr, value: 524288}
+        - {name: net.core.rmem_max, value: 33554432}
+        - {name: net.core.wmem_max, value: 33554432}
+        - {name: net.core.netdev_max_backlog, value: 300000}
+        - {name: net.ipv4.tcp_rmem, value: 4096 87380 33554432}
+        - {name: net.ipv4.tcp_wmem, value: 4096 65536 33554432}
+        - {name: net.ipv4.tcp_keepalive_time, value: 600}
+        - {name: net.ipv4.tcp_keepalive_intvl, value: 60}
 
-  - name: configure hugepage size
-    ansible.posix.sysctl:
-      name: vm.nr_hugepages
-      value: "{{ nr_hugepages }}"
-      sysctl_file: /etc/sysctl.d/99-epic.conf
-      sysctl_set: true
-      state: present
-    when: nr_hugepages is defined
+    - name: configure hugepage size
+      ansible.posix.sysctl:
+        name: vm.nr_hugepages
+        value: "{{ nr_hugepages }}"
+        sysctl_file: /etc/sysctl.d/99-epic.conf
+        sysctl_set: true
+        state: present
+      when: nr_hugepages is defined
 
-  - name: disable alt+ctrl+del
-    ansible.builtin.file:
-      src: /dev/null
-      dest: /etc/systemd/system/ctrl-alt-del.target
-      state: link
+    - name: disable alt+ctrl+del
+      ansible.builtin.file:
+        src: /dev/null
+        dest: /etc/systemd/system/ctrl-alt-del.target
+        state: link
 
-  - name: add grub options
-    ansible.builtin.copy:
-      src: grub
-      dest: /etc/default/grub
-      owner: root
-      group: root
-      mode: 0644
-    notify: grub-mkconfig
-    when: "'grub' in ansible_facts['packages']"
+    - name: add grub options
+      ansible.builtin.copy:
+        src: grub
+        dest: /etc/default/grub
+        owner: root
+        group: root
+        mode: 0644
+      notify: grub-mkconfig
+      when: "'grub' in ansible_facts['packages']"
 
-  - name: copy Epic sudoers file
-    ansible.builtin.copy:
-      src: sudoers
-      dest: /etc/sudoers.d/epic
-      owner: root
-      group: root
-      mode: 0440
+    - name: copy Epic sudoers file
+      ansible.builtin.copy:
+        src: sudoers
+        dest: /etc/sudoers.d/epic
+        owner: root
+        group: root
+        mode: 0440
 
   when: ansible_facts['distribution_major_version'] < '8'
 
 - block:
-  - name: add grub options
-    ansible.builtin.copy:
-      src: grub
-      dest: /etc/default/grub
-      owner: root
-      group: root
-      mode: 0644
-    notify: grub-mkconfig
-    when: "'grub2-common' in ansible_facts['packages']"
+    - name: add grub options
+      ansible.builtin.copy:
+        src: grub
+        dest: /etc/default/grub
+        owner: root
+        group: root
+        mode: 0644
+      notify: grub-mkconfig
+      when: "'grub2-common' in ansible_facts['packages']"
 
-  - name: configure tuned
-    ansible.builtin.lineinfile:
-      path: /etc/tuned/epic/tuned.conf
-      line: vm.hugetlb_shm_group = 10000
-      regexp: '^vm.hugetlb_shm_group'
-      insertafter: '^[sysctl]$'
+    - name: configure tuned
+      ansible.builtin.lineinfile:
+        path: /etc/tuned/epic/tuned.conf
+        line: vm.hugetlb_shm_group = 10000
+        regexp: '^vm.hugetlb_shm_group'
+        insertafter: '^[sysctl]$'
   when: ansible_facts['distribution_major_version'] >= '8'
 
 - name: install service files
@@ -285,8 +285,8 @@
   shell: set -o pipefail &
     grep '<ESMP_TRUSTED_DIR>' /epic/redalert/conf/epic.conf | cut -d '>' -f 2 | cut -d '<' -f 1
   register: esmp_trusted_dir
-  check_mode: no
-  changed_when: False
+  check_mode: false
+  changed_when: false
   when: ra_conf_file_stat['stat']['exists']
 
 - name: get contents of ESMP_TRUSTED_DIR
@@ -322,7 +322,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0755 # noqa risky-file-permissions
+    mode: 0755  # noqa risky-file-permissions
 
 - name: disable root login over SSH
   ansible.builtin.lineinfile:
@@ -500,7 +500,7 @@
   ansible.builtin.stat:
     path: /etc/vmware-tools
   register: etc_vmwaretools
-  changed_when: False
+  changed_when: false
   check_mode: false
 
 - name: copy tools.conf
