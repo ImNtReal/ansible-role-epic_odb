@@ -2,3 +2,10 @@
 useepicatservice: false
 
 ca_bundle: CA.pem
+
+epic_csr:
+  ou: IT
+  o: Epic
+  l: Verona
+  s: Wisconsin
+  c: US
