@@ -6,7 +6,7 @@ driver:
 lint: |
   ls molecule &&
   yamllint -c molecule/default/yaml-lint.yml . &&
-  ansible-lint
+  ansible-lint --exclude molecule/default/yaml-lint.yml
 platforms:
   - name: instance
     image: "geerlingguy/docker-${MOLECULE_DISTRO:-centos7}-ansible:latest"
