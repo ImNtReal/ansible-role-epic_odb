@@ -5,5 +5,5 @@ rules:
   line-length:
     max: 125
     level: warning
-  truty:
+  truthy:
     ignore: .github/workflows/main.yml
