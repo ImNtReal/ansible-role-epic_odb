@@ -7,4 +7,4 @@ rules:
     level: warning
   truthy:
     ignore: |
-      /.github/workflows/main.yml
+      .github/workflows/main.yml

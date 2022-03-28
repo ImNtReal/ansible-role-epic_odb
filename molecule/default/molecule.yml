@@ -5,7 +5,7 @@ driver:
   name: docker
 lint: |
   ls molecule &&
-  yamllint -c molecule/default/yaml-lint.yml . &&
+  yamllint -c molecule/default/yaml-lint.yml --no-warnings . &&
   ansible-lint --exclude molecule/default/yaml-lint.yml
 platforms:
   - name: instance
