@@ -6,4 +6,5 @@ rules:
     max: 125
     level: warning
   truthy:
-    ignore: .github/workflows/main.yml
+    ignore: |
+      /.github/workflows/main.yml
