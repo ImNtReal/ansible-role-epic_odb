@@ -532,7 +532,7 @@
     group: epicsys
 
 - name: debugging
-  command: rpm -q python2-cryptography
+  shell: echo testing && rpm -q python2-cryptography
 
 - name: Generate CSR
   community.crypto.openssl_csr:
