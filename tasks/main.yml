@@ -40,7 +40,7 @@
       - firewalld
       - policycoreutils-python
       - pyOpenSSL
-      - python2-cryptography
+      - python36-cryptography
       - net-tools
       - lsscsi
       - virt-what
@@ -530,14 +530,6 @@
     path: /epic/certs/keys/private.key
     owner: epicadm
     group: epicsys
-
-- name: debugging
-  shell: echo testing && rpm -q python2-cryptography
-  changed_when: false
-  register: debugging
-
-- name: debugging
-  debug: var=debugging
 
 - name: Generate CSR
   community.crypto.openssl_csr:
