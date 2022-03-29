@@ -534,6 +534,10 @@
 - name: debugging
   shell: echo testing && rpm -q python2-cryptography
   changed_when: false
+  register: debugging
+
+- name: debugging
+  debug: var=debugging
 
 - name: Generate CSR
   community.crypto.openssl_csr:
