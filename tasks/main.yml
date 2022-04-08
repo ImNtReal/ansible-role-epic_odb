@@ -75,7 +75,7 @@
       - chrony
       - iperf3
       - patch
-      - policycoreutils-python
+      - python3-policycoreutils
       - python3-cryptography
       - gcc
       - gdb
