@@ -26,70 +26,106 @@
 
 
 ### Install required packages
-- name: ensure packges needed for Epic and role are installed
-  ansible.builtin.yum:
-    name:
-      - perl-core
-      - perl-CGI
-      - perl-XML-Simple
-      - ksh
-      - sysstat
-      - psmisc
-      - cifs-utils
-      - openssh-server
-      - firewalld
-      - policycoreutils-python
-      - pyOpenSSL
-      - python36-cryptography
-      - net-tools
-      - lsscsi
-      - virt-what
-      - chrony
-      - iperf3
-      - patch
-      - gcc
-      - gdb
-      - lsof
-      - strace
-      - tmux
-      - perf
-      - dstat
-    state: present
-  when: ansible_facts['distribution_major_version'] < '8'
-  tags:
-    - firewall
+- name: Install packages for Red Hat distros
+  when: ansible_facts['os_family'] == 'RedHat'
+  block:
+    - name: ensure packges needed for Epic and role are installed
+      ansible.builtin.yum:
+        name:
+          - perl-core
+          - perl-CGI
+          - perl-XML-Simple
+          - ksh
+          - sysstat
+          - psmisc
+          - openssh-server
+          - firewalld
+          - policycoreutils-python
+          - python36-cryptography
+          - net-tools
+          - lsscsi
+          - virt-what
+          - chrony
+          - iperf3
+          - patch
+          - gcc
+          - gdb
+          - lsof
+          - strace
+          - tmux
+          - perf
+          - dstat
+        state: present
+      when: ansible_facts['distribution_major_version'] < '8'
+      tags:
+        - firewall
 
-- name: ensure packges needed for Epic and role are installed
-  ansible.builtin.dnf:
-    name:
-      - perl
-      - ksh
-      - sysstat
-      - psmisc
-      - cifs-utils
-      - openssh-server
-      - firewalld
-      - net-tools
-      - lsscsi
-      - virt-what
-      - chrony
-      - iperf3
-      - patch
-      - python3-policycoreutils
-      - python3-cryptography
-      - gcc
-      - gdb
-      - lsof
-      - strace
-      - tmux
-      - perf
-      - pcp-system-tools
-      - bcc-tools
-      - epic-config
-    state: present
-  when: ansible_facts['distribution_major_version'] > '7'
-  tags:
-    - firewall
+    - name: ensure packges needed for Epic and role are installed
+      ansible.builtin.dnf:
+        name:
+          - perl
+          - ksh
+          - sysstat
+          - psmisc
+          - openssh-server
+          - firewalld
+          - net-tools
+          - lsscsi
+          - virt-what
+          - chrony
+          - iperf3
+          - patch
+          - python3-policycoreutils
+          - python3-cryptography
+          - gcc
+          - gdb
+          - lsof
+          - strace
+          - tmux
+          - perf
+          - pcp-system-tools
+          - bcc-tools
+          - epic-config
+        state: present
+      when: ansible_facts['distribution_major_version'] > '7'
+      tags:
+        - firewall
+
+- name: Install packages for Red Hat distros
+  when: ansible_facts['os_family'] == 'Debian'
+  block:
+    - name: ensure packages needed for Epic and role are installed
+      ansible.builtin.apt:
+        name:
+          - perl
+          - perl-doc
+          - ksh
+          - sysstat
+          - psmisc
+          - openssh-server
+          - ufw
+          - net-tools
+          - lsscsi
+          - virt-what
+          - cron
+          - chrony
+          - rsync
+          - iperf3
+          - libaio1
+          - patch
+          - python3-cryptography
+          - dstat
+          - gcc
+          - gdb
+          - lsof
+          - strace
+          - tmux
+          - linux-tools-common
+          - bpftrace
+          - htop
+          - iftop
+          - nmon
+        state: present
 
 ### Post package install tasks
 - name: gather package facts

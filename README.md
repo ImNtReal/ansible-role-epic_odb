@@ -7,7 +7,8 @@ This role will prepare RHEL servers to act as Epic ODB servers.
 Requirements
 ------------
 
-No extra packages required.
+To run the role successfully against RHEL 8+ or Ubuntu, you will need to pre-install the epic-config package,
+or have it hosted on a repository already installed on the hosts.
 
 Role Variables
 --------------
