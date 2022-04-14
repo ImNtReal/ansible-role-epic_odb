@@ -501,7 +501,9 @@
     name: firewalld
     state: started
     enabled: true
-  when: ansible_env['container'] is not defined
+  when:
+    - ansible_env['container'] is not defined
+    - ansible_facts['os_family'] == 'Debian'
   tags:
     - firewall
 
