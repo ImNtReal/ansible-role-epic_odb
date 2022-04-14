@@ -587,6 +587,7 @@
   check_mode: false
 
 - name: update chrony config
+  when: chrony_conf_stat['stat']['exists']
   block:
     - name: disable makestep
       ansible.builtin.lineinfile:
@@ -603,7 +604,6 @@
         path: /etc/chrony.conf
         regexp: '^logchange'
         line: 'logchange 0.5'
-  when: chrony_conf_stat['stat']['exists']
 
 ### epicmenu config
 - name: create conf directory
