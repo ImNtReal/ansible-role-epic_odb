@@ -570,6 +570,13 @@
       tags:
         - firewall
 
+    - name: Ensure SSH is enabled in ufw
+      community.general.ufw:
+        rule: allow
+        name: OpenSSH
+      tags:
+        - firewall
+
     - name: Enable UFW
       community.general.ufw:
         state: enabled
