@@ -92,7 +92,7 @@
         - firewall
 
 - name: Install packages for Red Hat distros
-  when: ansible_facts['os_family'] == 'Debian'
+  when: ansible_distribution == 'Ubuntu'
   block:
     - name: ensure packages needed for Epic and role are installed
       ansible.builtin.apt:
@@ -503,7 +503,7 @@
     enabled: true
   when:
     - ansible_env['container'] is not defined
-    - ansible_facts['os_family'] != 'Debian'
+    - ansible_distribution != 'Ubuntu'
   tags:
     - firewall
 
@@ -514,7 +514,7 @@
     enabled: true
   when:
     - ansible_env['container'] is not defined
-    - ansible_facts['os_family'] == 'Debian'
+    - ansible_distribution == 'Ubuntu'
   tags:
     - firewall
 
@@ -536,7 +536,7 @@
   changed_when: false
   when:
     - ansible_facts['services']['firewalld.service']['state'] == 'running'
-    - ansible_facts['os_family'] != 'Debian'
+    - ansible_distribution != 'Ubuntu'
   tags:
     - firewall
 
@@ -549,7 +549,7 @@
   loop: "{{ odb_firewalld_services }}"
   when:
     - ansible_facts['services']['firewalld.service']['state'] == 'running'
-    - ansible_facts['os_family'] != 'Debian'
+    - ansible_distribution != 'Ubuntu'
   tags:
     - firewall
 
@@ -560,7 +560,7 @@
     state: enabled
   when:
     - ansible_facts['services']['firewalld.service']['state'] == 'running'
-    - ansible_facts['os_family'] != 'Debian'
+    - ansible_distribution != 'Ubuntu'
   tags:
     - firewall
 

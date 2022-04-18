@@ -17,10 +17,6 @@
   tags:
     - firewall
 
-- debug: var=epic_firewall_ports
-  tags:
-    - firewall
-
 - name: clear ufw ports line
   ansible.builtin.set_fact:
     ufw_epic_firewall_ports: ''
@@ -34,10 +30,6 @@
   loop_control:
     extended: true
   when: ansible_facts['os_family'] == 'Debian'
-  tags:
-    - firewall
-
-- debug: var=ufw_epic_firewall_ports
   tags:
     - firewall
 
