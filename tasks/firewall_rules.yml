@@ -16,7 +16,7 @@
     epic_firewall_ports: "{{ firewall_service['ports'] }}"
   tags:
     - firewall
-- debug: epic_firewall_ports
+- debug: var=epic_firewall_ports
   tags:
     - firewall
 - name: set ufw ports line
@@ -28,7 +28,7 @@
   when: ansible_facts['os_family'] == 'Debian'
   tags:
     - firewall
-- debug: ufw_epic_firewall_ports
+- debug: var=ufw_epic_firewall_ports
   tags:
     - firewall
 - name: copy {{ epic_firewall_short }} firewall rule
