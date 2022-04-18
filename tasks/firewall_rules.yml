@@ -1,19 +1,27 @@
 ---
 - name: set epic_firewall_short
   ansible.builtin.set_fact:
-    epic_firewall_short: "{{ item['name'] }}"
+    epic_firewall_short: "{{ firewall_service['name'] }}"
   tags:
     - firewall
 
 - name: set epic_firewall_description
   ansible.builtin.set_fact:
-    epic_firewall_description: "{{ item['description'] }}"
+    epic_firewall_description: "{{ firewall_service['description'] }}"
   tags:
     - firewall
 
 - name: set epic_firewall_ports
   ansible.builtin.set_fact:
-    epic_firewall_ports: "{{ item['ports'] }}"
+    epic_firewall_ports: "{{ firewall_service['ports'] }}"
+  tags:
+    - firewall
+
+- name: set ufw ports line
+  ansible.builtin.set_fact:
+    ufw_epic_firewall_ports: "{{ ufw_epic_firewall_ports | default('') }}{{ (index > 0) | ternary(',','') }}{{ item['port'] }}/{{ item['protocol' | default('tcp') }}"
+  loop: "{{ epic_firewall_ports }}"
+  when: ansible_facts['os_family'] == 'Debian'
   tags:
     - firewall
 
@@ -24,5 +32,17 @@
     owner: root
     group: root
     mode: 0660
+  when: ansible_facts['os_family'] != 'Debian'
+  tags:
+    - firewall
+
+- name: copy {{ epic_firewall_short }} firewall rule
+  ansible.builtin.template:
+    src: ufw_app.j2
+    dest: /etc/ufw/applications.d/{{ epic_firewall_short }}
+    owner: root
+    group: root
+    mode: 0660
+  when: ansible_facts['os_family'] == 'Debian'
   tags:
     - firewall

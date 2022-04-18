@@ -503,6 +503,17 @@
     enabled: true
   when:
     - ansible_env['container'] is not defined
+    - ansible_facts['os_family'] != 'Debian'
+  tags:
+    - firewall
+
+- name: ufw started
+  ansible.builtin.systemd:
+    name: ufw
+    state: started
+    enabled: true
+  when:
+    - ansible_env['container'] is not defined
     - ansible_facts['os_family'] == 'Debian'
   tags:
     - firewall
@@ -510,6 +521,8 @@
 - name: Setup firewall rules
   include_tasks: firewall_rules.yml
   loop: "{{ odb_firewalld_services }}"
+  loop_control:
+    loop_var: firewall_service
   tags:
     - firewall
 
@@ -521,7 +534,9 @@
 - name: reload firewalld
   command: firewall-cmd --reload
   changed_when: false
-  when: ansible_facts['services']['firewalld.service']['state'] == 'running'
+  when:
+    - ansible_facts['services']['firewalld.service']['state'] == 'running'
+    - ansible_facts['os_family'] != 'Debian'
   tags:
     - firewall
 
@@ -532,7 +547,9 @@
     immediate: true
     state: enabled
   loop: "{{ odb_firewalld_services }}"
-  when: ansible_facts['services']['firewalld.service']['state'] == 'running'
+  when:
+    - ansible_facts['services']['firewalld.service']['state'] == 'running'
+    - ansible_facts['os_family'] != 'Debian'
   tags:
     - firewall
 
@@ -541,7 +558,9 @@
     port: 2222/tcp
     permanent: true
     state: enabled
-  when: ansible_facts['services']['firewalld.service']['state'] == 'running'
+  when:
+    - ansible_facts['services']['firewalld.service']['state'] == 'running'
+    - ansible_facts['os_family'] != 'Debian'
   tags:
     - firewall
 
