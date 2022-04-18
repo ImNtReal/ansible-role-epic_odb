@@ -531,38 +531,35 @@
   tags:
     - firewall
 
-- name: reload firewalld
-  command: firewall-cmd --reload
-  changed_when: false
-  when:
-    - ansible_facts['services']['firewalld.service']['state'] == 'running' | default('stopped')
-    - ansible_distribution != 'Ubuntu'
-  tags:
-    - firewall
+- name: Enable firewall rules on EL
+  when: ansible_distribution != 'Ubuntu'
+  block:
+    - name: reload firewalld
+      command: firewall-cmd --reload
+      changed_when: false
+      when: ansible_facts['services']['firewalld.service']['state'] == 'running'
+      tags:
+        - firewall
 
-- name: enable dynamic Epic firewall rules
-  ansible.posix.firewalld:
-    service: "{{ item['name'] }}"
-    permanent: true
-    immediate: true
-    state: enabled
-  loop: "{{ odb_firewalld_services }}"
-  when:
-    - ansible_facts['services']['firewalld.service']['state'] == 'running' | default('stopped')
-    - ansible_distribution != 'Ubuntu'
-  tags:
-    - firewall
+    - name: enable dynamic Epic firewall rules
+      ansible.posix.firewalld:
+        service: "{{ item['name'] }}"
+        permanent: true
+        immediate: true
+        state: enabled
+      loop: "{{ odb_firewalld_services }}"
+      when: ansible_facts['services']['firewalld.service']['state'] == 'running'
+      tags:
+        - firewall
 
-- name: Enable SFTP port on firewall
-  ansible.posix.firewalld:
-    port: 2222/tcp
-    permanent: true
-    state: enabled
-  when:
-    - ansible_facts['services']['firewalld.service']['state'] == 'running' | default('stopped')
-    - ansible_distribution != 'Ubuntu'
-  tags:
-    - firewall
+    - name: Enable SFTP port on firewall
+      ansible.posix.firewalld:
+        port: 2222/tcp
+        permanent: true
+        state: enabled
+      when: ansible_facts['services']['firewalld.service']['state'] == 'running'
+      tags:
+        - firewall
 
 ### Get status of /etc/vmware-tools before trying to copy file there
 - name: get status of /etc/vmware-tools directory
