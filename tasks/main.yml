@@ -535,7 +535,7 @@
   command: firewall-cmd --reload
   changed_when: false
   when:
-    - ansible_facts['services']['firewalld.service']['state'] == 'running'
+    - ansible_facts['services']['firewalld.service']['state'] == 'running' | default('stopped')
     - ansible_distribution != 'Ubuntu'
   tags:
     - firewall
@@ -548,7 +548,7 @@
     state: enabled
   loop: "{{ odb_firewalld_services }}"
   when:
-    - ansible_facts['services']['firewalld.service']['state'] == 'running'
+    - ansible_facts['services']['firewalld.service']['state'] == 'running' | default('stopped')
     - ansible_distribution != 'Ubuntu'
   tags:
     - firewall
@@ -559,7 +559,7 @@
     permanent: true
     state: enabled
   when:
-    - ansible_facts['services']['firewalld.service']['state'] == 'running'
+    - ansible_facts['services']['firewalld.service']['state'] == 'running' | default('stopped')
     - ansible_distribution != 'Ubuntu'
   tags:
     - firewall
