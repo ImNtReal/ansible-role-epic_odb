@@ -356,6 +356,13 @@
     - Clear RedAlert CAs
   when: ca_bundle_stat['stat']['exists']
 
+- name: Get selinux port tags for ssh_port_t
+  shell: semanage port -l | grep ssh_port_t
+  register: ssh_port_t_stat
+  check_mode: false
+  changed_when: false
+  when: ansible_facts['selinux']['status'] == 'enabled'
+- debug: var=ssh_port_t_stat
 - name: enable SSH on port 2222 in selinux
   community.general.seport:
     ports: 22, 2222
