@@ -19,7 +19,7 @@
 
 - name: set ufw ports line
   ansible.builtin.set_fact:
-    ufw_epic_firewall_ports: "{{ ufw_epic_firewall_ports | default('') }}{{ (index > 0) | ternary(',','') }}{{ item['port'] }}/{{ item['protocol' | default('tcp') }}"
+    ufw_epic_firewall_ports: "{{ ufw_epic_firewall_ports | default('') }}{{ (index > 0) | ternary(',','') }}{{ item['port'] }}/{{ item['protocol'] | default('tcp') }}"
   loop: "{{ epic_firewall_ports }}"
   when: ansible_facts['os_family'] == 'Debian'
   tags:
