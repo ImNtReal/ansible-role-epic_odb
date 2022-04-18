@@ -16,9 +16,17 @@
     epic_firewall_ports: "{{ firewall_service['ports'] }}"
   tags:
     - firewall
+
 - debug: var=epic_firewall_ports
   tags:
     - firewall
+
+- name: clear ufw ports line
+  ansible.builtin.set_fact:
+    ufw_epic_firewall_ports: ''
+  tags:
+    - firewall
+
 - name: set ufw ports line
   ansible.builtin.set_fact:
     ufw_epic_firewall_ports: "{{ ufw_epic_firewall_ports | default('') }}{{ (ansible_loop['index'] > 1) | ternary(',','') }}{{ item['port'] }}/{{ item['protocol'] | default('tcp') }}"
@@ -28,9 +36,11 @@
   when: ansible_facts['os_family'] == 'Debian'
   tags:
     - firewall
+
 - debug: var=ufw_epic_firewall_ports
   tags:
     - firewall
+
 - name: copy {{ epic_firewall_short }} firewall rule
   ansible.builtin.template:
     src: firewalld.xml.j2
