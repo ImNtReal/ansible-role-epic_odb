@@ -577,7 +577,7 @@
         - firewall
 
     - name: enable dynamic Epic firewall rules
-      ansible.posix.ufw:
+      community.general.ufw:
         rule: allow
         name: "{{ item['name'] }}"
       loop: "{{ odb_firewalld_services }}"
@@ -585,7 +585,7 @@
         - firewall
 
     - name: Enable SFTP port on firewall
-      ansible.posix.ufw:
+      community.general.ufw:
         rule: allow
         port: '2222'
         proto: tcp
