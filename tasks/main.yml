@@ -362,14 +362,16 @@
   check_mode: false
   changed_when: false
   when: ansible_facts['selinux']['status'] == 'enabled'
-- debug: var=ssh_port_t_stat
+
 - name: enable SSH on port 2222 in selinux
   community.general.seport:
     ports: 22, 2222
     proto: tcp
     setype: ssh_port_t
     state: present
-  when: ansible_facts['selinux']['status'] == 'enabled'
+  when:
+    - ansible_facts['selinux']['status'] == 'enabled'
+    - "'2222' not in ssh_port_t_stat['stdout']"
 
 - name: create /etc/ssh
   ansible.builtin.file:
