@@ -561,6 +561,37 @@
       tags:
         - firewall
 
+- name: Enable firewall rules on Ubuntu
+  when: ansible_distribution == 'Ubuntu'
+  block:
+    - name: reload firewalld
+      command: ufw reload
+      changed_when: false
+      tags:
+        - firewall
+
+    - name: Enable UFW
+      community.general.ufw:
+        state: enabled
+      tags:
+        - firewall
+
+    - name: enable dynamic Epic firewall rules
+      ansible.posix.ufw:
+        rule: allow
+        name: "{{ item['name'] }}"
+      loop: "{{ odb_firewalld_services }}"
+      tags:
+        - firewall
+
+    - name: Enable SFTP port on firewall
+      ansible.posix.ufw:
+        rule: allow
+        port: '2222'
+        proto: tcp
+      tags:
+        - firewall
+
 ### Get status of /etc/vmware-tools before trying to copy file there
 - name: get status of /etc/vmware-tools directory
   ansible.builtin.stat:
