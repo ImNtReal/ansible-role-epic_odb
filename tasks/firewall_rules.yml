@@ -25,7 +25,7 @@
 
 - name: set ufw ports line
   ansible.builtin.set_fact:
-    ufw_epic_firewall_ports: "{{ ufw_epic_firewall_ports | default('') }}{{ (ansible_loop['index'] > 1) | ternary(',','') }}{{ item['port'] }}/{{ item['protocol'] | default('tcp') }}"
+    ufw_epic_firewall_ports: "{{ ufw_epic_firewall_ports | default('') }}{{ (ansible_loop['index'] > 1) | ternary(',','') }}{{ item['port'] }}{{ (ansible_loop['revindex'] = 1) | '/'item['protocol'] | default('tcp') }}"
   loop: "{{ epic_firewall_ports }}"
   loop_control:
     extended: true

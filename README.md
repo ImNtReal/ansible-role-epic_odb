@@ -68,7 +68,7 @@ inventory:
         epicuser_groups:
           - some_ad_group
 
-        odb_firewalld_services:
+        odb_firewall_services:
           - name: epiccomm
             description: EpicComm
             ports:

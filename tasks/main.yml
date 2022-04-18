@@ -520,7 +520,7 @@
 
 - name: Setup firewall rules
   include_tasks: firewall_rules.yml
-  loop: "{{ odb_firewalld_services }}"
+  loop: "{{ odb_firewall_services }}"
   loop_control:
     loop_var: firewall_service
   tags:
@@ -547,7 +547,7 @@
         permanent: true
         immediate: true
         state: enabled
-      loop: "{{ odb_firewalld_services }}"
+      loop: "{{ odb_firewall_services }}"
       when: ansible_facts['services']['firewalld.service']['state'] == 'running'
       tags:
         - firewall
@@ -587,7 +587,7 @@
       community.general.ufw:
         rule: allow
         name: "{{ item['name'] }}"
-      loop: "{{ odb_firewalld_services }}"
+      loop: "{{ odb_firewall_services }}"
       tags:
         - firewall
 

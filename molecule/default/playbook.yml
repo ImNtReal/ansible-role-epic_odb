@@ -29,7 +29,7 @@
     epicuser_groups:
       - epicadm
 
-    odb_firewalld_services:
+    odb_firewall_services:
       - name: epiccomm
         description: EpicComm
         ports:
