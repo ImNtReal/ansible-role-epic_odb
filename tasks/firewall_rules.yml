@@ -29,7 +29,14 @@
   loop: "{{ epic_firewall_ports }}"
   loop_control:
     extended: true
-  when: ansible_facts['os_family'] == 'Debian'
+  when: ansible_distribution == 'Ubuntu'
+  tags:
+    - firewall
+
+- name: add protocol to ufw ports line
+  ansible.builtin.set_fact:
+    ufw_epic_firewall_ports: "{{ ufw_epic_firewall_ports }}/{{ firewall_service['protocol'] | default('tcp') }}"
+  when: ansible_distribution == 'Ubuntu'
   tags:
     - firewall
 
@@ -40,7 +47,7 @@
     owner: root
     group: root
     mode: 0660
-  when: ansible_facts['os_family'] != 'Debian'
+  when: ansible_distribution != 'Ubuntu'
   tags:
     - firewall
 
@@ -51,6 +58,6 @@
     owner: root
     group: root
     mode: 0660
-  when: ansible_facts['os_family'] == 'Debian'
+  when: ansible_distribution == 'Ubuntu'
   tags:
     - firewall
