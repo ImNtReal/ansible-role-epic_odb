@@ -153,7 +153,7 @@
         mode: 0644
 
     - name: check and config sysctl
-      include: sysctl.yml
+      include_tasks: sysctl.yml
       loop:
         - {name: vm.hugetlb_shm_group, value: 10000}
         - {name: vm.swappiness, value: 1}
