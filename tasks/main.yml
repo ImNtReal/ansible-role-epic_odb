@@ -287,7 +287,7 @@
     path: /epic_core
     state: directory
     owner: epicadm
-    group: cachegrp
+    group: 10002
     mode: 0777
 
 - name: create epic directory
