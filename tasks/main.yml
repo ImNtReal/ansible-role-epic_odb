@@ -8,9 +8,22 @@
   loop:
     - {name: 'epicsys', gid: 10000}
     - {name: 'epicuser', gid: 10001}
-    - {name: 'cachegrp', gid: 10002}
     - {name: 'dmngrp', gid: 10003}
     - {name: 'iscagent', gid: 10004}
+
+- name: create cachegrp
+  ansible.builtin.group:
+    name: 'cachegrp'
+    gid: 10002
+    state: present
+  when: cachegrp
+
+- name: create irisusr
+  ansible.builtin.group:
+    name: 'irisusr'
+    gid: 10002
+    state: present
+  when: not cachegrp
 
 - name: create Epic users
   ansible.builtin.user:
