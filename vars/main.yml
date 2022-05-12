@@ -3,7 +3,7 @@ epic_users:
   - {user: epicadm,
      comment: "Epic Admin",
      group: epicsys,
-     groups: "epicuser,cachegrp,dmngrp",
+     groups: "epicuser,irisusr,dmngrp",
      uid: 10000,
      state: present,
      password: "{{ epic_passwords['epicadm'] }}"}
