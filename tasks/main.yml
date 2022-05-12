@@ -148,7 +148,9 @@
 - name: load service facts
   service_facts:
 
-- block:
+- name: configure EL < 8
+  when: ansible_facts['distribution_major_version'] < '8'
+  block:
     - name: stop and disable tuned
       ansible.builtin.service:
         name: tuned
@@ -221,9 +223,9 @@
         group: root
         mode: 0440
 
-  when: ansible_facts['distribution_major_version'] < '8'
-
-- block:
+- name: configure EL > 7
+  when: ansible_facts['distribution_major_version'] >= '8'
+  block:
     - name: add grub options
       ansible.builtin.copy:
         src: grub
@@ -234,13 +236,19 @@
       notify: grub-mkconfig
       when: "'grub2-common' in ansible_facts['packages']"
 
-    - name: configure tuned
+    - name: configure hugepage group
       ansible.builtin.lineinfile:
         path: /etc/tuned/epic/tuned.conf
         line: vm.hugetlb_shm_group = 10000
         regexp: '^vm.hugetlb_shm_group'
         insertafter: '^[sysctl]$'
-  when: ansible_facts['distribution_major_version'] >= '8'
+
+    - name: configure number of hugepages
+      ansible.builtin.lineinfile:
+        path: /etc/tuned/epic/tuned.conf
+        line: vm.nr_hugepages = {{ nr_hugepages }}
+        regexp: '^vm.nr_hugepages'
+        insertafter: '^vm.hugetlb_shm_group'
 
 - name: install service files
   ansible.builtin.copy:
