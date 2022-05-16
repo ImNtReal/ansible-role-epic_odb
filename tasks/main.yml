@@ -13,14 +13,14 @@
 
 - name: create cachegrp
   ansible.builtin.group:
-    name: 'cachegrp'
+    name: cachegrp
     gid: 10002
     state: present
   when: cachegrp
 
 - name: create irisusr
   ansible.builtin.group:
-    name: 'irisusr'
+    name: irisusr
     gid: 10002
     state: present
   when: not cachegrp
