@@ -250,6 +250,28 @@
         regexp: '^vm.nr_hugepages'
         insertafter: '^vm.hugetlb_shm_group'
 
+- name: set default file context for bin directories
+  community.general.sefcontext:
+    target: "{{ item }}(/.*)?"
+    setype: bin_t
+    state: present
+  loop:
+    - /epic/bin
+    - /epic/redalert/bin
+  when: ansible_facts['os_family'] == 'RedHat'
+  notify: restorecon epic
+
+- name: set default file context for instance bin directories
+  community.general.sefcontext:
+    target: "/epic/{{ item }}/bin(/.*)?"
+    setype: bin_t
+    state: present
+  loop: "{{ odb_instances }}"
+  when:
+    - odb_instances id defined
+    - ansible_facts['os_family'] == 'RedHat'
+  notify: restorecon epic
+
 - name: install service files
   ansible.builtin.copy:
     src: "{{ item }}.service"

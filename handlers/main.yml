@@ -27,3 +27,6 @@
   become: true
   become_user: epicadm
   when: sslcert_bin_stat['stat']['exists']
+
+- name: restorecon epic
+  command: restorecon -Rv /epic
