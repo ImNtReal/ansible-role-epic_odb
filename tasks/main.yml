@@ -268,7 +268,7 @@
     state: present
   loop: "{{ odb_instances }}"
   when:
-    - odb_instances id defined
+    - odb_instances is defined
     - ansible_facts['os_family'] == 'RedHat'
   notify: restorecon epic
 
