@@ -389,7 +389,7 @@
     - esmp_trusted_dir['stdout'] | default('')
 
 - name: get CA bundle from uri
-  when: ca_bundle is match("http*://*")
+  when: ca_bundle is match("https?://.*")
   block:
     - name: copy CA bunle from {{ ca_bundle }}
       ansible.builtin.copy:
@@ -403,7 +403,7 @@
         - Clear RedAlert CAs
 
 - name: get CA bundle from file
-  when: ca_bundle is not match("http*://*")
+  when: ca_bundle is not match("https?://.*")
   block:
     - name: check for CA bundle
       ansible.builtin.stat:
