@@ -1,12 +1,4 @@
 ---
-### Check for RedAlert install
-- name: stat /epic/redalert/bin/sslcert
-  ansible.builtin.stat:
-    path: /epic/redalert/bin/sslcert
-  changed_when: false
-  check_mode: false
-  register: redalert_sslcert_stat
-
 ### User and group creation
 - name: create Epic groups
   ansible.builtin.group:
@@ -258,6 +250,73 @@
         regexp: '^vm.nr_hugepages'
         insertafter: '^vm.hugetlb_shm_group'
 
+### Directory creation
+- name: create /usr/local/epic
+  ansible.builtin.file:
+    path: /usr/local/epic
+    state: directory
+    owner: epicadm
+    group: epicsys
+    mode: 0755
+
+- name: create core dump directory
+  ansible.builtin.file:
+    path: /epic_core
+    state: directory
+    owner: epicadm
+    group: 10002
+    mode: 0777
+
+- name: create epicfiles directory
+  ansible.builtin.file:
+    path: /epicfiles
+    state: directory
+    owner: root
+    group: root
+    mode: 0775
+
+- name: create epic directory
+  ansible.builtin.file:
+    path: /epic
+    state: directory
+    owner: epicadm
+    group: epicsys
+    mode: '2755'
+
+- name: create bin directory
+  ansible.builtin.file:
+    path: /epic/bin
+    state: directory
+    owner: epicadm
+    group: epicsys
+    mode: 0755
+  tags:
+    - epicmenu
+
+- name: create /epic/tmp directory
+  ansible.builtin.file:
+    path: /epic/tmp
+    state: directory
+    owner: epicadm
+    group: epicuser
+    mode: '1777'
+
+- name: create /epic/pki
+  ansible.builtin.file:
+    path: /epic/pki
+    state: directory
+    owner: epicadm
+    group: epicsys
+    mode: 0755
+
+- name: ensure encryption keys directory exists
+  ansible.builtin.file:
+    path: /epic/pki/keys
+    state: directory
+    owner: epicadm
+    group: epicsys
+    mode: 0700
+
 - name: set default file context for bin directories
   community.general.sefcontext:
     target: "{{ item }}(/.*)?"
@@ -302,63 +361,6 @@
   ansible.builtin.systemd:
     name: redalert
     enabled: true
-
-### Directory creation
-- name: create /usr/local/epic
-  ansible.builtin.file:
-    path: /usr/local/epic
-    state: directory
-    owner: epicadm
-    group: epicsys
-    mode: 0755
-
-- name: create Cache registration files directory
-  ansible.builtin.file:
-    path: /usr/local/etc/cachesys
-    state: directory
-    owner: root
-    group: root
-    mode: 0755
-
-- name: create core dump directory
-  ansible.builtin.file:
-    path: /epic_core
-    state: directory
-    owner: epicadm
-    group: 10002
-    mode: 0777
-
-- name: create epic directory
-  ansible.builtin.file:
-    path: /epic
-    state: directory
-    owner: epicadm
-    group: epicsys
-    mode: '2755'
-
-- name: create /epic/tmp directory
-  ansible.builtin.file:
-    path: /epic/tmp
-    state: directory
-    owner: epicadm
-    group: epicuser
-    mode: '1777'
-
-- name: create /epic/pki
-  ansible.builtin.file:
-    path: /epic/pki
-    state: directory
-    owner: epicadm
-    group: epicsys
-    mode: 0755
-
-- name: ensure encryption keys directory exists
-  ansible.builtin.file:
-    path: /epic/pki/keys
-    state: directory
-    owner: epicadm
-    group: epicsys
-    mode: 0700
 
 ### Copy scripts and miscelaneous files
 - name: check sslcert binary
@@ -749,17 +751,7 @@
     path: /epic/conf
     state: directory
     owner: epicadm
-    group: epicuser
-    mode: 0755
-  tags:
-    - epicmenu
-
-- name: create bin directory
-  ansible.builtin.file:
-    path: /epic/bin
-    state: directory
-    owner: epicadm
-    group: epicuser
+    group: epicsys
     mode: 0755
   tags:
     - epicmenu
