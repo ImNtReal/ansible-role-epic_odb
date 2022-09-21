@@ -1,7 +1,7 @@
 ---
 useepicatservice: false
 
-ca_bundle: CA.pem
+ca_bundle: https://letsencrypt.org/certs/isrgrootx1.pem
 
 epic_csr:
   ou: IT

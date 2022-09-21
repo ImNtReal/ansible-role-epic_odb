@@ -1,4 +1,12 @@
 ---
+### Check for RedAlert install
+- name: stat /epic/redalert/bin/sslcert
+  ansible.builtin.stat:
+    path: /epic/redalert/bin/sslcert
+  changed_when: false
+  check_mode: false
+  register: redalert_sslcert_stat
+
 ### User and group creation
 - name: create Epic groups
   ansible.builtin.group:
@@ -336,9 +344,9 @@
     group: epicuser
     mode: '1777'
 
-- name: create /epic/certs
+- name: create /epic/pki
   ansible.builtin.file:
-    path: /epic/certs
+    path: /epic/pki
     state: directory
     owner: epicadm
     group: epicsys
@@ -346,7 +354,7 @@
 
 - name: ensure encryption keys directory exists
   ansible.builtin.file:
-    path: /epic/certs/keys
+    path: /epic/pki/keys
     state: directory
     owner: epicadm
     group: epicsys
@@ -380,24 +388,41 @@
     - ra_conf_file_stat
     - esmp_trusted_dir['stdout'] | default('')
 
-- name: check for CA bundle
-  ansible.builtin.stat:
-    path: files/{{ ca_bundle }}
-  register: ca_bundle_stat
-  changed_when: false
-  check_mode: false
+- name: get CA bundle from uri
+  when: ca_bundle is match("http*://*")
+  block:
+    - name: copy CA bunle from {{ ca_bundle }}
+      ansible.builtin.copy:
+        src: "{{ lookup('ansible.builtin.url', ca_bundle) }}"
+        dest: /epic/pki/{{ ca_bundle | basename }}
+        owner: epicadm
+        group: epicsys
+        mode: 0644
+      notify:
+        - Update RedAlert CAs
+        - Clear RedAlert CAs
 
-- name: copy CA certs
-  ansible.builtin.copy:
-    src: "{{ ca_bundle }}"
-    dest: /epic/certs/CA.pem
-    owner: epicadm
-    group: epicsys
-    mode: 0644
-  notify:
-    - Update RedAlert CAs
-    - Clear RedAlert CAs
-  when: ca_bundle_stat['stat']['exists']
+- name: get CA bundle from file
+  when: ca_bundle is not match("http*://*")
+  block:
+    - name: check for CA bundle
+      ansible.builtin.stat:
+        path: files/{{ ca_bundle }}
+      register: ca_bundle_stat
+      changed_when: false
+      check_mode: false
+
+    - name: copy CA certs
+      ansible.builtin.copy:
+        src: "{{ ca_bundle }}"
+        dest: /epic/pki/{{ ca_bundle | basename }}
+        owner: epicadm
+        group: epicsys
+        mode: 0644
+      notify:
+        - Update RedAlert CAs
+        - Clear RedAlert CAs
+      when: ca_bundle_stat['stat']['exists']
 
 - name: Get selinux port tags for ssh_port_t
   shell: set -o pipefail |
@@ -673,14 +698,15 @@
 
 - name: Generate private key
   community.crypto.openssl_privatekey:
-    path: /epic/certs/keys/private.key
+    path: /epic/pki/keys/private.key
+    passphrase: "{{ private_key_passphrase | default(omit) }}"
     owner: epicadm
     group: epicsys
 
 - name: Generate CSR
   community.crypto.openssl_csr:
-    path: /epic/certs/{{ ansible_hostname }}.csr
-    privatekey_path: /epic/certs/keys/private.key
+    path: /epic/pki/{{ ansible_hostname }}.csr
+    privatekey_path: /epic/pki/keys/private.key
     common_name: '{{ ansible_fqdn }}'
     organizational_unit_name: "{{ epic_csr['ou'] }}"
     organization_name: "{{ epic_csr['o'] }}"
