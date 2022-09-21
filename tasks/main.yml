@@ -700,6 +700,7 @@
   community.crypto.openssl_privatekey:
     path: /epic/pki/keys/private.key
     passphrase: "{{ private_key_passphrase | default(omit) }}"
+    cipher: auto
     owner: epicadm
     group: epicsys
 
