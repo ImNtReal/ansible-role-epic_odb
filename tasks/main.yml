@@ -708,6 +708,7 @@
   community.crypto.openssl_csr:
     path: /epic/pki/{{ ansible_hostname }}.csr
     privatekey_path: /epic/pki/keys/private.key
+    privatekey_passphrase: "{{ private_key_passphrase | default(omit) }}"
     common_name: '{{ ansible_fqdn }}'
     organizational_unit_name: "{{ epic_csr['ou'] }}"
     organization_name: "{{ epic_csr['o'] }}"
