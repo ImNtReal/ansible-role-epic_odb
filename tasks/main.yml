@@ -393,7 +393,7 @@
   block:
     - name: copy CA bunle from {{ ca_bundle }}
       ansible.builtin.copy:
-        content: "{{ lookup('ansible.builtin.url', ca_bundle) }}"
+        content: "{{ lookup('ansible.builtin.url', ca_bundle, split_lines=false) }}"
         dest: /epic/pki/{{ ca_bundle | basename }}
         owner: epicadm
         group: epicsys
