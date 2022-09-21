@@ -21,6 +21,7 @@
     path: "{{ item['path'] }}"
     state: absent
   loop: "{{ esmp_trusted_dir_files['files'] }}"
+  when: esmp_trusted_dir_files['files'] | default(false)
 
 - name: Update RedAlert CAs
   command: /epic/redalert/bin/sslcert --trust /epic/pki/{{ ca_bundle | basename }}
