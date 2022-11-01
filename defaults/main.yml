@@ -1,6 +1,8 @@
 ---
 useepicatservice: false
 
+members_command: getent group
+
 ca_bundle: https://letsencrypt.org/certs/isrgrootx1.pem
 
 epic_csr:
