@@ -2,6 +2,7 @@
 useepicatservice: false
 
 members_command: getent group
+members_filter: "| cut -d ':' -f 4 | sed 's/,/\n/g'"
 
 ca_bundle: https://letsencrypt.org/certs/isrgrootx1.pem
 
