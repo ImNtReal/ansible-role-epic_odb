@@ -46,7 +46,7 @@ epic_users:
      password: "{{ epic_passwords['epictxt'] }}"}
   - {user: iscagent,
      comment: "Epic iscagent",
-     group: epicuser,
+     group: iscagent,
      groups: users,
      uid: 10004,
      state: present,
