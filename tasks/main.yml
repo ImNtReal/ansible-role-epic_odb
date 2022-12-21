@@ -273,7 +273,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0775
+    mode: 0755
 
 - name: create epic directory
   ansible.builtin.file:
@@ -288,7 +288,7 @@
     path: /epic/bin
     state: directory
     owner: epicadm
-    group: epicsys
+    group: epicuser
     mode: 0755
   tags:
     - epicmenu
@@ -315,7 +315,7 @@
     state: directory
     owner: epicadm
     group: epicsys
-    mode: 0700
+    mode: 0755
 
 - name: set default file context for bin directories
   community.general.sefcontext:
@@ -751,7 +751,7 @@
     path: /epic/conf
     state: directory
     owner: epicadm
-    group: epicsys
+    group: epicuser
     mode: 0755
   tags:
     - epicmenu
