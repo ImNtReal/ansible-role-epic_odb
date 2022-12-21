@@ -72,7 +72,11 @@ udevadm trigger > /dev/null
 
 # If device map exists, mount it.
 if [ -e "$snap_path" ]; then
-  mount -o ro "$snap_path" "$temp_path" > /dev/null
+  if [[ $(mount | grep mst_lv | awk '{ print $5 }') -eq 'xfs' ]]; then
+    mount -o nouuid,ro "$snap_path" "$temp_path" > /dev/null
+  else
+    mount -o ro "$snap_path" "$temp_path" > /dev/null
+  fi
 else
   echo "ERROR - $snap_path does not exist."
   rmdir "$temp_path"
