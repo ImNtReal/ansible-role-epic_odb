@@ -205,13 +205,13 @@
         dest: /etc/systemd/system/ctrl-alt-del.target
         state: link
 
-    - name: add grub options
-      ansible.builtin.copy:
-        src: grub
+    - name: Add transparent_hugepage setting to kernel command line
+      ansible.builtin.lineinfile:
         dest: /etc/default/grub
-        owner: root
-        group: root
-        mode: 0644
+        state: present
+        backrefs: true
+        regexp: '^(GRUB_CMDLINE_LINUX=(?!.*transparent_hugepage)\"[^\"]+)(\".*)'
+        line: '\1 transparent_hugepage=never\2'
       notify: grub-mkconfig
       when: "'grub' in ansible_facts['packages']"
 
@@ -226,16 +226,6 @@
 - name: configure EL > 7
   when: ansible_facts['distribution_major_version'] >= '8'
   block:
-    - name: add grub options
-      ansible.builtin.copy:
-        src: grub
-        dest: /etc/default/grub
-        owner: root
-        group: root
-        mode: 0644
-      notify: grub-mkconfig
-      when: "'grub2-common' in ansible_facts['packages']"
-
     - name: configure hugepage group
       ansible.builtin.lineinfile:
         path: /etc/tuned/epic/tuned.conf
