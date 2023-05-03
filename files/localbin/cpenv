@@ -41,8 +41,8 @@ cd $src
 # Find all journaled data sets for the instance
 for ds in $(find * -maxdepth 1 -type f \( -name CACHE.DAT -o -name IRIS.DAT \) 2> /dev/null | egrep -v "$nojournal"); do
 	echo "$ds" | cut -d '/' -f 1
-	if [ -z "$dsthost" ]; then
-	  ssh $dsthost mkdir -p "${dst}/$(dirname $ds)"
+	if [ ! -z "$dsthost" ]; then
+	  ssh $dsthost mkdir -p "${dstpath}/$(dirname $ds)"
     pv $ds | zstd -T8 - | ssh $dsthost "zstdcat -T8 - | pv > ${dstpath}/${ds}"
 	else
 	  mkdir -p "${dst}/$(dirname $ds)"
