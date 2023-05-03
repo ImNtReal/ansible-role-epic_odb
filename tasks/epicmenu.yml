@@ -4,7 +4,7 @@
     path: /epic/{{ EpicEnvironment['Instance'] | lower }}/conf
     state: directory
     owner: epicadm
-    group: epicuser
+    group: epicsys
     mode: 0755
   tags:
     - epicmenu

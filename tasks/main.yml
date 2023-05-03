@@ -278,7 +278,7 @@
     path: /epic/bin
     state: directory
     owner: epicadm
-    group: epicsys
+    group: epicuser
     mode: 0755
   tags:
     - epicmenu
@@ -741,7 +741,7 @@
     path: /epic/conf
     state: directory
     owner: epicadm
-    group: epicsys
+    group: epicuser
     mode: 0755
   tags:
     - epicmenu
