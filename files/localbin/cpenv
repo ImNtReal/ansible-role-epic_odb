@@ -17,17 +17,23 @@ fi
 src="${1}"
 dst="${2}"
 
-if [[ ! -d $src ]] || [[ ! -d $dst ]]; then
-	usage
-	exit 2
-fi
-
-unset dsthost
-unset dstpath
-
 if [[ $dst =~ ':' ]]; then
+	if [[ ! -d $src ]]; then
+		usage
+		exit 2
+	fi
+
+  # unset these, so we can detect if this is set, later
+  unset dsthost
+  unset dstpath
+
   dsthost=$(echo $dst | cut -d ':' -f 1)
   dstpath=$(echo $dst | cut -d ':' -f 2)
+else
+	if [[ ! -d $src ]] || [[ ! -d $dst ]]; then
+		usage
+		exit 2
+	fi
 fi
 
 cd $src
