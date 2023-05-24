@@ -418,7 +418,7 @@
 
 - name: Get selinux port tags for ssh_port_t
   shell: set -o pipefail |
-    semanage port -l |
+    /sbin/semanage port -l |
     grep ssh_port_t
   register: ssh_port_t_stat
   check_mode: false
