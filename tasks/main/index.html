@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>main.yml - epic_odb Ansible Role</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "main.yml";
+        var mkdocs_page_input_path = "tasks/main.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> epic_odb Ansible Role
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Defaults</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../defaults/main/">main.yml</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Vars</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../variables/main/">main.yml</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tasks</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../flow/">Flow</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">main.yml</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../users.md">None</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../file-system.md">None</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../minio.md">None</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Templates</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="" href="../../roletemplates/minio.env.j2.md">None</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../../roletemplates/minio.init.j2.md">None</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../../roletemplates/minio.service.j2.md">None</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Handlers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../handlers/main/">main.yml</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="" href="../../appendix.md">None</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">epic_odb Ansible Role</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
+          <li>Tasks &raquo;</li>
+      <li>main.yml</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="mainyml">main.yml</h1>
+<ul>
+<li>
+<p>create Epic groups</p>
+</li>
+<li>
+<p>create cachegrp</p>
+</li>
+<li>
+<p>create irisusr</p>
+</li>
+<li>
+<p>create Epic users</p>
+</li>
+<li>
+<p>Block: Install packages for Red Hat distros</p>
+<ul>
+<li>ensure packges needed for Epic and role are installed<br />
+<strong><font color="green">Tags: </font></strong></li>
+</ul>
+</li>
+<li>
+<p>Block: Install packages for Red Hat distros</p>
+<ul>
+<li>ensure packages needed for Epic and role are installed</li>
+</ul>
+</li>
+<li>
+<p>gather package facts</p>
+</li>
+<li>
+<p>load service facts</p>
+</li>
+<li>
+<p>Block: configure EL &lt; 8</p>
+<ul>
+<li>
+<p>stop and disable tuned</p>
+</li>
+<li>
+<p>configure security limits</p>
+</li>
+<li>
+<p>check and config sysctl</p>
+</li>
+<li>
+<p>configure hugepage size</p>
+</li>
+<li>
+<p>disable alt+ctrl+del</p>
+</li>
+<li>
+<p>Add transparent_hugepage setting to kernel command line</p>
+</li>
+<li>
+<p>copy Epic sudoers file</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Block: configure EL &gt; 7</p>
+<ul>
+<li>
+<p>configure hugepage group</p>
+</li>
+<li>
+<p>configure number of hugepages</p>
+</li>
+</ul>
+</li>
+<li>
+<p>create /usr/local/epic</p>
+</li>
+<li>
+<p>create core dump directory</p>
+</li>
+<li>
+<p>create epicfiles directory</p>
+</li>
+<li>
+<p>create epic directory</p>
+</li>
+<li>
+<p>create bin directory<br />
+<font color="green">Tags: </font>epicmenu</p>
+</li>
+<li>
+<p>create /epic/tmp directory</p>
+</li>
+<li>
+<p>create /epic/pki</p>
+</li>
+<li>
+<p>ensure encryption keys directory exists</p>
+</li>
+<li>
+<p>set default file context for bin directories</p>
+</li>
+<li>
+<p>set default file context for instance bin directories</p>
+</li>
+<li>
+<p>install service files</p>
+</li>
+<li>
+<p>make sure epic@.service is enabled</p>
+</li>
+<li>
+<p>enable redalert.service</p>
+</li>
+<li>
+<p>check sslcert binary</p>
+</li>
+<li>
+<p>check RedAlert conf file</p>
+</li>
+<li>
+<p>get ESMP_TRUSTED_DIR</p>
+</li>
+<li>
+<p>get contents of ESMP_TRUSTED_DIR</p>
+</li>
+<li>
+<p>Block: get CA bundle from uri</p>
+<ul>
+<li>copy CA bunle from {{ ca_bundle }}</li>
+</ul>
+</li>
+<li>
+<p>Block: get CA bundle from file</p>
+<ul>
+<li>
+<p>check for CA bundle</p>
+</li>
+<li>
+<p>copy CA certs</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Get selinux port tags for ssh_port_t</p>
+</li>
+<li>
+<p>enable SSH on port 2222 in selinux</p>
+</li>
+<li>
+<p>create /etc/ssh</p>
+</li>
+<li>
+<p>disable root login over SSH</p>
+</li>
+<li>
+<p>explicily enable port 22</p>
+</li>
+<li>
+<p>set sshd to listen on port 2222</p>
+</li>
+<li>
+<p>set port 2222 to sftp only</p>
+</li>
+<li>
+<p>set epic menus for groups</p>
+</li>
+<li>
+<p>set epic menus for users</p>
+</li>
+<li>
+<p>copy /usr/local/bin files</p>
+</li>
+<li>
+<p>create manage_epicuser_group</p>
+</li>
+<li>
+<p>add cron job for manage_epicuser_group</p>
+</li>
+<li>
+<p>add audit lines to PAM files</p>
+</li>
+<li>
+<p>create working copy of system sudoers file</p>
+</li>
+<li>
+<p>back up sudoers file</p>
+</li>
+<li>
+<p>remove Defaults requiretty</p>
+</li>
+<li>
+<p>check for sudoers differences</p>
+</li>
+<li>
+<p>Check working copy of suders file, and replace active sudoers config</p>
+</li>
+<li>
+<p>refresh service facts<br />
+<font color="green">Tags: </font>firewall</p>
+</li>
+<li>
+<p>start firewalld<br />
+<font color="green">Tags: </font>firewall</p>
+</li>
+<li>
+<p>ufw started<br />
+<font color="green">Tags: </font>firewall</p>
+</li>
+<li>
+<p>Setup firewall rules<br />
+<font color="green">Tags: </font>firewall</p>
+</li>
+<li>
+<p>refresh service facts<br />
+<font color="green">Tags: </font>firewall</p>
+</li>
+<li>
+<p>Block: Enable firewall rules on EL</p>
+<ul>
+<li>reload firewalld<br />
+<strong><font color="green">Tags: </font></strong></li>
+</ul>
+</li>
+<li>
+<p>Block: Enable firewall rules on Ubuntu</p>
+<ul>
+<li>reload firewalld<br />
+<strong><font color="green">Tags: </font></strong></li>
+</ul>
+</li>
+<li>
+<p>get status of /etc/vmware-tools directory</p>
+</li>
+<li>
+<p>copy tools.conf</p>
+</li>
+<li>
+<p>Generate private key</p>
+</li>
+<li>
+<p>Generate CSR</p>
+</li>
+<li>
+<p>check for chrony.conf</p>
+</li>
+<li>
+<p>Block: update chrony config</p>
+<ul>
+<li>
+<p>disable makestep</p>
+</li>
+<li>
+<p>set minsources to 2</p>
+</li>
+<li>
+<p>set logchange to 0.5</p>
+</li>
+</ul>
+</li>
+<li>
+<p>create conf directory<br />
+<font color="green">Tags: </font>epicmenu</p>
+</li>
+<li>
+<p>install epicmenu confs<br />
+<font color="green">Tags: </font>epicmenu</p>
+</li>
+<li>
+<p>ensure links exists for epicmenus<br />
+<font color="green">Tags: </font>epicmenu</p>
+</li>
+<li>
+<p>install environment epicmenus<br />
+<font color="green">Tags: </font>epicmenu</p>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../flow/" class="btn btn-neutral float-left" title="Flow"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../handlers/main/" class="btn btn-neutral float-right" title="main.yml">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../flow/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../handlers/main/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

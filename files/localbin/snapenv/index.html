@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>snapenv - epic_odb Ansible Role</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "snapenv";
+        var mkdocs_page_input_path = "files/localbin/snapenv.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../../../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../../.." class="icon icon-home"> epic_odb Ansible Role
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Defaults</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../defaults/main/">main.yml</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Vars</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../variables/main/">main.yml</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tasks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../tasks/flow/">Flow</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../tasks/main/">main.yml</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../../../tasks/users.md">None</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../../../tasks/file-system.md">None</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../../../tasks/minio.md">None</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Templates</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="" href="../../../roletemplates/minio.env.j2.md">None</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../../../roletemplates/minio.init.j2.md">None</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="../../../roletemplates/minio.service.j2.md">None</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Handlers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../../handlers/main/">main.yml</a>
+                  </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="" href="../../../appendix.md">None</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../..">epic_odb Ansible Role</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
+      <li>snapenv</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="snapenv">snapenv</h1>
+<hr />
+<pre><code>
+#! /usr/bin/env bash
+set -Eeo pipefail
+
+function usage() {
+  echo &quot;Usage:&quot;
+  echo &quot;  $0 &lt;ENV&gt;&quot;
+  echo &quot;  ENV: Environment to snapshot (e.g. tst)&quot;
+        echo
+        echo &quot;The script will return the temporary mount path.&quot;
+}
+
+if [[ $# != 1 ]]; then
+  usage
+  exit 1
+fi
+
+if [[ $EUID -ne 0 ]]; then
+   echo &quot;This script must be run as root&quot;
+   exit 1
+fi
+
+instance=&quot;$1&quot;
+if ccontrol qlist &quot;$instance&quot; &amp;&gt; /dev/null; then # Check if instance is valid Cache'
+  directory=$(ccontrol qlist &quot;$instance&quot; | cut -d '^' -f 2)
+elif iris qlist &quot;$instance&quot; &amp;&gt; /dev/null; then # Check if instance is valid IRIS
+  directory=$(iris qlist &quot;$instance&quot; | cut -d '^' -f 2)
+else
+  echo &quot;ERROR - Can't find instance ${instance}.&quot;
+  exit 2
+fi
+
+inst_path=$(echo &quot;$directory&quot; | awk -F '/' 'NF{NF-=1}1' OFS='/')
+environment=$(/epic/bin/epiccontrol printenvs | tr -s ' ' | grep -i &quot;^ $instance &quot; | awk '{ print $2 }')
+data_path=$(&quot;${inst_path}/bin/managedb&quot; --report name=&quot;$environment&quot; --parsable | tail -n 1 | awk -F '/' 'NF{NF-=2}1' OFS='/')
+lv=$(findmnt -n -o SOURCE --target &quot;$directory&quot;)
+
+if ! lvs &quot;$lv&quot; &amp;&gt; /dev/null; then
+  echo &quot;ERROR - $lv does not appear to be a LVM logical volume.&quot;
+  exit 2
+fi
+
+if lvs &quot;${lv}_snap&quot; &amp;&gt; /dev/null; then
+  echo &quot;ERROR - Logical volume ${lv}_snap already exists.&quot;
+  exit 2
+fi
+
+lv_name=$(lvs --noheadings -o lv_name &quot;$lv&quot; | sed 's/ //g')
+vg=$(lvs --noheadings -o vg_name &quot;$lv&quot; | sed 's/ //g')
+vg_free=$(vgs --noheadings --nosuffix --units b -o vg_free &quot;$vg&quot; | sed 's/ //g')
+
+sudo -iu epicadm &quot;${inst_path}/bin/instfreeze&quot; &gt; /dev/null
+
+if [[ &quot;$vg_free&quot; -le 5368709120 ]]; then # If there is 5 GB or less free
+  lvcreate -L &quot;${vg_free}B&quot; -s -n &quot;${lv_name}_snap&quot; &quot;$lv&quot; &gt; /dev/null
+else
+  if [[ &quot;$(echo &quot;$vg_free * 0.9 % 512&quot; | bc | cut -d '.' -f 1)&quot; -eq 0 ]]; then # If 90% of free space is divisable by 512
+    lvcreate -L &quot;$(echo &quot;$vg_free * 0.9&quot; | bc | cut -d '.' -f 1)B&quot; -s -n &quot;${lv_name}_snap&quot; &quot;$lv&quot; &gt; /dev/null
+  else
+    lvcreate -L &quot;$(echo &quot;512 * (($vg_free * 0.9) / 512)&quot; | bc | cut -d '.' -f 1)B&quot; -s -n &quot;${lv_name}_snap&quot; &quot;$lv&quot; &gt; /dev/null
+  fi
+fi
+
+snap_path=&quot;/dev/${vg}/${lv_name}_snap&quot;
+
+sudo -iu epicadm &quot;${inst_path}/bin/instthaw&quot; &gt; /dev/null
+
+temp_path=&quot;$(mktemp -d)&quot;
+
+# Trigger device mapper to update
+udevadm trigger &gt; /dev/null
+
+# If device map exists, mount it.
+if [ -e &quot;$snap_path&quot; ]; then
+  if [[ &quot;$(mount | grep $lv | awk '{ print $5 }')&quot; == 'xfs' ]]; then
+    mount -o nouuid,ro &quot;$snap_path&quot; &quot;$temp_path&quot; &gt; /dev/null
+  else
+    mount -o ro &quot;$snap_path&quot; &quot;$temp_path&quot; &gt; /dev/null
+  fi
+else
+  echo &quot;ERROR - $snap_path does not exist.&quot;
+  rmdir &quot;$temp_path&quot;
+  exit 3
+fi
+
+echo &quot;$temp_path&quot;
+
+# vim:set ts=2 sw=2 et:
+
+</code></pre>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script>var base_url = '../../..';</script>
+    <script src="../../../js/theme_extra.js" defer></script>
+    <script src="../../../js/theme.js" defer></script>
+      <script src="../../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
