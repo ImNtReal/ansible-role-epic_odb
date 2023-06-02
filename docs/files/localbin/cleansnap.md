@@ -1,0 +1,66 @@
+
+
+
+
+# cleansnap
+  
+---  
+```
+
+#! /usr/bin/env bash
+set -Eeuo pipefail
+
+function usage() {
+  echo "Usage:"
+  echo "  $0 <ENV>"
+  echo "  ENV: Environment to clean snapshot of (e.g. tst)"
+}
+
+if [[ $# != 1 ]]; then
+  usage
+  exit 1
+fi
+
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root"
+   exit 1
+fi
+
+instance="$1"
+if ccontrol qlist "$instance" &> /dev/null; then # Make sure instance is valid
+  instance_path=$(ccontrol qlist ${instance} | cut -d '^' -f 2 | rev | cut -d '/' -f 2- | rev)
+  instance_lv=$(findmnt -n -o SOURCE ${instance_path})
+  instance_lv_name=$(lvs --noheadings -o lv_name "$instance_lv" | sed 's/ //g')
+  lv=${instance_lv}_snap
+  lv_name=${instance_lv_name}_snap
+elif iris qlist "$instance" &> /dev/null; then # Check if instance is valid IRIS
+  instance_path=$(iris qlist ${instance} | cut -d '^' -f 2 | rev | cut -d '/' -f 2- | rev)
+  instance_lv=$(findmnt -n -o SOURCE ${instance_path})
+  instance_lv_name=$(lvs --noheadings -o lv_name "$instance_lv" | sed 's/ //g')
+  lv=${instance_lv}_snap
+  lv_name=${instance_lv_name}_snap
+else
+  echo "ERROR - Can't find instance ${instance}."
+  exit 2
+fi
+
+echo $lv
+if ! lvs "$lv" &> /dev/null; then
+  echo "ERROR - $lv_name does not appear to be a LVM logical volume."
+  exit 2
+fi
+
+vg=$(lvs --noheadings -o vg_name "$lv" | sed 's/ //g')
+
+mount_points=$(mount | grep $lv | awk '{ print $3 }')
+
+for mount_point in $mount_points; do
+  umount $mount_point
+  rmdir $mount_point
+done
+
+lvremove -f "${lv}"
+
+# vim:set ts=2 sw=2 et:
+  
+```

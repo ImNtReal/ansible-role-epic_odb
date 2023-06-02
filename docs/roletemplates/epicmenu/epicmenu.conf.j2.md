@@ -1,0 +1,29 @@
+
+
+
+
+# epicmenu.conf.j2
+  
+---  
+```
+
+<?xml version="1.0" encoding="utf-8"?>
+<xml>
+    <AUTOFIND>0</AUTOFIND>
+    <MENU_DEF>
+        <MAIN>
+        {% set ns = namespace(order=0) %}
+        {% for EpicEnvironment in epic_environments %}
+            <{{ EpicEnvironment['Instance'] }}>
+                <COMMAND>/epic/{{ EpicEnvironment['Instance'] | lower }}/bin/epicmenu</COMMAND>
+                <NAME>{{ EpicEnvironment['Instance'] }}</NAME>
+                <ORDER>{{ loop.index }}</ORDER>
+                <SHORTCUT>{{ EpicEnvironment['Instance'] }}</SHORTCUT>
+                <TYPE>COMMAND</TYPE>
+            </{{ EpicEnvironment['Instance'] }}>
+        {% set ns.order = loop.index + 1 %}
+        {% endfor %}
+        </MAIN>
+    </MENU_DEF>
+</xml>  
+```

@@ -1,0 +1,62 @@
+
+
+
+
+# cpenv
+  
+---  
+```
+
+#! /usr/bin/env bash
+
+nojournal='^dcifc$|^eid$|^err$|^loc$|^locmu$|^rt$|^rtepicsec$|^rtlimited$|^rtrouscratch$|^rtrouscratchlimited$|^scratchdb$'
+
+function usage() {
+	echo "Usage:"
+	echo "  $0 <SRC> <DST>"
+	echo "  SRC: Path to source environment (e.g. /epic/mst)"
+	echo "  DST: Path to desitnation environment, local or remote (e.g. dsthost:/epic/dst)"
+}
+
+if [[ $# != 2 ]]; then
+	usage
+	exit 1
+fi
+
+src="${1}"
+dst="${2}"
+
+if [[ $dst =~ ':' ]]; then
+	if [[ ! -d $src ]]; then
+		usage
+		exit 2
+	fi
+
+  # unset these, so we can detect if this is set, later
+  unset dsthost
+  unset dstpath
+
+  dsthost=$(echo $dst | cut -d ':' -f 1)
+  dstpath=$(echo $dst | cut -d ':' -f 2)
+else
+	if [[ ! -d $src ]] || [[ ! -d $dst ]]; then
+		usage
+		exit 2
+	fi
+fi
+
+cd $src
+
+# Find all journaled data sets for the instance
+for ds in $(find * -maxdepth 1 -type f \( -name CACHE.DAT -o -name IRIS.DAT \) 2> /dev/null | egrep -v "$nojournal"); do
+	echo "$ds" | cut -d '/' -f 1
+	if [ ! -z "$dsthost" ]; then
+	  ssh $dsthost mkdir -p "${dstpath}/$(dirname $ds)"
+    pv $ds | zstd -T8 - | ssh $dsthost "zstdcat -T8 - | pv > ${dstpath}/${ds}"
+	else
+	  mkdir -p "${dst}/$(dirname $ds)"
+    pv "${ds}" > "${dst}/${ds}"
+  fi
+done
+  
+```

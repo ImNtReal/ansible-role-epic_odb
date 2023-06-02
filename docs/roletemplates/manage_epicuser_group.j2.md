@@ -1,0 +1,30 @@
+
+
+
+
+# manage_epicuser_group.j2
+  
+---  
+```
+
+#!/bin/bash
+
+# look through epicuser group for users who shouldn't be there
+for user in $({{ members_command }} epicuser {{ members_filter }} | egrep -iv {{ forced_epicusers | join("|") | quote }}); do
+  if [[ ! $(id -Gn $user | egrep {{ epicuser_groups | join("|") | quote }}) ]]; then # if I'm not in at least one AD group, remove me from epicuser
+    gpasswd -d $user epicuser
+  fi
+done
+
+{% for item in epicuser_groups %}
+# add members of {{ item }} to epicuser
+for user in $({{ members_command }} {{ item }} {{ members_filter }}); do
+  usermod -aG epicuser $user
+done
+{% endfor %}
+
+# add non-group users
+{% for item in forced_epicusers %}
+usermod -aG epicuser {{ item }}
+{% endfor %}  
+```

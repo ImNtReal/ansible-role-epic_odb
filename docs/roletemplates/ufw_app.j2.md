@@ -1,0 +1,15 @@
+
+
+
+
+# ufw_app.j2
+  
+---  
+```
+
+[{{ epic_firewall_short }}]
+title={{ epic_firewall_short }}
+description={{ epic_firewall_description }}
+ports={{ ufw_epic_firewall_ports }}
+  
+```

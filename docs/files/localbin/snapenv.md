@@ -1,0 +1,98 @@
+
+
+
+
+# snapenv
+  
+---  
+```
+
+#! /usr/bin/env bash
+set -Eeo pipefail
+
+function usage() {
+  echo "Usage:"
+  echo "  $0 <ENV>"
+  echo "  ENV: Environment to snapshot (e.g. tst)"
+        echo
+        echo "The script will return the temporary mount path."
+}
+
+if [[ $# != 1 ]]; then
+  usage
+  exit 1
+fi
+
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root"
+   exit 1
+fi
+
+instance="$1"
+if ccontrol qlist "$instance" &> /dev/null; then # Check if instance is valid Cache'
+  directory=$(ccontrol qlist "$instance" | cut -d '^' -f 2)
+elif iris qlist "$instance" &> /dev/null; then # Check if instance is valid IRIS
+  directory=$(iris qlist "$instance" | cut -d '^' -f 2)
+else
+  echo "ERROR - Can't find instance ${instance}."
+  exit 2
+fi
+
+inst_path=$(echo "$directory" | awk -F '/' 'NF{NF-=1}1' OFS='/')
+environment=$(/epic/bin/epiccontrol printenvs | tr -s ' ' | grep -i "^ $instance " | awk '{ print $2 }')
+data_path=$("${inst_path}/bin/managedb" --report name="$environment" --parsable | tail -n 1 | awk -F '/' 'NF{NF-=2}1' OFS='/')
+lv=$(findmnt -n -o SOURCE --target "$directory")
+
+if ! lvs "$lv" &> /dev/null; then
+  echo "ERROR - $lv does not appear to be a LVM logical volume."
+  exit 2
+fi
+
+if lvs "${lv}_snap" &> /dev/null; then
+  echo "ERROR - Logical volume ${lv}_snap already exists."
+  exit 2
+fi
+
+lv_name=$(lvs --noheadings -o lv_name "$lv" | sed 's/ //g')
+vg=$(lvs --noheadings -o vg_name "$lv" | sed 's/ //g')
+vg_free=$(vgs --noheadings --nosuffix --units b -o vg_free "$vg" | sed 's/ //g')
+
+sudo -iu epicadm "${inst_path}/bin/instfreeze" > /dev/null
+
+if [[ "$vg_free" -le 5368709120 ]]; then # If there is 5 GB or less free
+  lvcreate -L "${vg_free}B" -s -n "${lv_name}_snap" "$lv" > /dev/null
+else
+  if [[ "$(echo "$vg_free * 0.9 % 512" | bc | cut -d '.' -f 1)" -eq 0 ]]; then # If 90% of free space is divisable by 512
+    lvcreate -L "$(echo "$vg_free * 0.9" | bc | cut -d '.' -f 1)B" -s -n "${lv_name}_snap" "$lv" > /dev/null
+  else
+    lvcreate -L "$(echo "512 * (($vg_free * 0.9) / 512)" | bc | cut -d '.' -f 1)B" -s -n "${lv_name}_snap" "$lv" > /dev/null
+  fi
+fi
+
+snap_path="/dev/${vg}/${lv_name}_snap"
+
+sudo -iu epicadm "${inst_path}/bin/instthaw" > /dev/null
+
+temp_path="$(mktemp -d)"
+
+# Trigger device mapper to update
+udevadm trigger > /dev/null
+
+# If device map exists, mount it.
+if [ -e "$snap_path" ]; then
+  if [[ "$(mount | grep $lv | awk '{ print $5 }')" == 'xfs' ]]; then
+    mount -o nouuid,ro "$snap_path" "$temp_path" > /dev/null
+  else
+    mount -o ro "$snap_path" "$temp_path" > /dev/null
+  fi
+else
+  echo "ERROR - $snap_path does not exist."
+  rmdir "$temp_path"
+  exit 3
+fi
+
+echo "$temp_path"
+
+# vim:set ts=2 sw=2 et:
+  
+```

@@ -1,0 +1,17 @@
+
+
+
+
+# grub.j2
+  
+---  
+```
+
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="$(sed 's, release .*$,,g' /etc/system-release)"
+GRUB_DEFAULT=saved
+GRUB_DISABLE_SUBMENU=true
+GRUB_TERMINAL_OUTPUT="console"
+GRUB_CMDLINE_LINUX=""crashkernel=auto resume=/dev/mapper/rhel_{{ ansible_hostname }}-swap rd.lvm.lv=rhel_{{ ansible_hostname }}/root rd.lvm.lv=rhel_{{ ansible_hostname }}/swap rhgb quiet transparent_hugepage=never"
+GRUB_DISABLE_RECOVERY="true"  
+```
