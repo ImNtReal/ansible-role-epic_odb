@@ -2,7 +2,7 @@
 site_name: epic_odb Ansible Role
 site_description: Ansible role to deploy Epic ODB servers
 theme:
-  name: material
+  name: readthedocs
 
 plugins:
   - search
