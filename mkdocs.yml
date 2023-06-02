@@ -1,4 +1,29 @@
 ---
+site_name: epic_odb Ansible Role
+site_description: Ansible role to deploy Epic ODB servers
+theme:
+  name: material
+
 plugins:
   - search
   - mermaid2
+
+nav:
+  - index.md
+  - Defaults:
+    - defaults/main.md
+  - Vars:
+    - variables/main.md
+  - Tasks:
+    - tasks/flow.md
+    - tasks/main.md
+    - tasks/users.md
+    - tasks/file-system.md
+    - tasks/minio.md
+  - Templates:
+      - roletemplates/minio.env.j2.md
+      - roletemplates/minio.init.j2.md
+      - roletemplates/minio.service.j2.md
+  - Handlers:
+    - handlers/main.md
+  - appendix.md
