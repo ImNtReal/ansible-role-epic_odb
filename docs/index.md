@@ -7,7 +7,7 @@
 ---
 ## Role Name
   
-C:\Users\jmpugh\git\ansible-role-epic_odb  
+epic_odb  
   
 ---
 ## Description
