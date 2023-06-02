@@ -1,0 +1,4 @@
+---
+plugins:
+  - search
+  - mermaid2
