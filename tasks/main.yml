@@ -233,13 +233,6 @@
         regexp: '^vm.hugetlb_shm_group'
         insertafter: '^[sysctl]$'
 
-    - name: configure number of hugepages
-      ansible.builtin.lineinfile:
-        path: /etc/tuned/epic/tuned.conf
-        line: vm.nr_hugepages = {{ nr_hugepages }}
-        regexp: '^vm.nr_hugepages'
-        insertafter: '^vm.hugetlb_shm_group'
-
 ### Directory creation
 - name: create /usr/local/epic
   ansible.builtin.file:
