@@ -227,13 +227,34 @@
   when: ansible_facts['distribution_major_version'] >= '8'
   block:
     - name: Configure hugepage group
-      ansible.builtin.lineinfile:
+      community.general.ini_file:
         path: /etc/tuned/epic/tuned.conf
-        line: vm.hugetlb_shm_group = 10000
-        regexp: '^vm.hugetlb_shm_group'
-        insertafter: '^[sysctl]$'
+        section: sysctl
+        option: vm.hugetlb_shm_group
+        value: 10000
+      notify: Set tuned profile
 
-    - name: 
+    - name: Configure nosmt for public clouds
+      community.general.ini_file:
+        path: /etc/tuned/epic/tuned.conf
+        section: bootloader
+        option: cmdline.nosmt
+        value: nosmt
+      when:
+        ansible_system_vendor == 'Amazon EC2' or
+        ansible_system_vendor == 'Microsoft Azure' or
+        ansible_system_vendor == 'GCE'
+      notify: Set tuned profile
+      
+    - name: Configure unknown_nmi_panic for public clouds
+      community.general.ini_file:
+        path: /etc/tuned/epic/tuned.conf
+        section: sysctl
+        option: kernel.unknown_nmi_panic
+        value: 1
+      when:
+        ansible_system_vendor == 'Amazon EC2'
+      notify: Set tuned profile
 
 ### Directory creation
 - name: Create /usr/local/epic

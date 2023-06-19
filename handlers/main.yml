@@ -31,3 +31,6 @@
 
 - name: Run restorecon epic
   command: restorecon -Rv /epic
+
+- name: Set tuned profile
+  command: tuned-adm profile epic
