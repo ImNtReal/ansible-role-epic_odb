@@ -1,29 +1,29 @@
 ---
-- name: set epic_firewall_short
+- name: Set epic_firewall_short
   ansible.builtin.set_fact:
     epic_firewall_short: "{{ firewall_service['name'] }}"
   tags:
     - firewall
 
-- name: set epic_firewall_description
+- name: Set epic_firewall_description
   ansible.builtin.set_fact:
     epic_firewall_description: "{{ firewall_service['description'] }}"
   tags:
     - firewall
 
-- name: set epic_firewall_ports
+- name: Set epic_firewall_ports
   ansible.builtin.set_fact:
     epic_firewall_ports: "{{ firewall_service['ports'] }}"
   tags:
     - firewall
 
-- name: clear ufw ports line
+- name: Clear ufw ports line
   ansible.builtin.set_fact:
     ufw_epic_firewall_ports: ''
   tags:
     - firewall
 
-- name: set ufw ports line
+- name: Set ufw ports line
   ansible.builtin.set_fact:
     ufw_epic_firewall_ports: "{{ ufw_epic_firewall_ports | default('') }}{{ (ansible_loop['index'] > 1) | ternary(',','') }}{{ item['port'] }}"
   loop: "{{ epic_firewall_ports }}"
@@ -33,14 +33,14 @@
   tags:
     - firewall
 
-- name: add protocol to ufw ports line
+- name: Add protocol to ufw ports line
   ansible.builtin.set_fact:
     ufw_epic_firewall_ports: "{{ ufw_epic_firewall_ports }}/{{ firewall_service['protocol'] | default('tcp') }}"
   when: ansible_distribution == 'Ubuntu'
   tags:
     - firewall
 
-- name: copy {{ epic_firewall_short }} firewall rule
+- name: Copy {{ epic_firewall_short }} firewall rule
   ansible.builtin.template:
     src: firewalld.xml.j2
     dest: /etc/firewalld/services/{{ epic_firewall_short }}.xml
@@ -51,7 +51,7 @@
   tags:
     - firewall
 
-- name: copy {{ epic_firewall_short }} firewall rule
+- name: Copy {{ epic_firewall_short }} firewall rule
   ansible.builtin.template:
     src: ufw_app.j2
     dest: /etc/ufw/applications.d/{{ epic_firewall_short }}

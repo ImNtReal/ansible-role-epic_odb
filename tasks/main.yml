@@ -1,6 +1,6 @@
 ---
 ### User and group creation
-- name: create Epic groups
+- name: Create Epic groups
   ansible.builtin.group:
     name: "{{ item['name'] }}"
     gid: "{{ item['gid'] }}"
@@ -11,21 +11,21 @@
     - {name: 'dmngrp', gid: 10003}
     - {name: 'iscagent', gid: 10004}
 
-- name: create cachegrp
+- name: Create cachegrp
   ansible.builtin.group:
     name: cachegrp
     gid: 10002
     state: present
   when: cachegrp
 
-- name: create irisusr
+- name: Create irisusr
   ansible.builtin.group:
     name: irisusr
     gid: 10002
     state: present
   when: not cachegrp
 
-- name: create Epic users
+- name: Create Epic users
   ansible.builtin.user:
     createhome: true
     name: "{{ item['user'] }}"
@@ -42,7 +42,7 @@
 - name: Install packages for Red Hat distros
   when: ansible_facts['os_family'] == 'RedHat'
   block:
-    - name: ensure packges needed for Epic and role are installed
+    - name: Ensure packges needed for Epic and role are installed
       ansible.builtin.yum:
         name:
           - perl-core
@@ -73,7 +73,7 @@
       tags:
         - firewall
 
-    - name: ensure packges needed for Epic and role are installed
+    - name: Ensure packges needed for Epic and role are installed
       ansible.builtin.dnf:
         name:
           - perl
@@ -107,7 +107,7 @@
 - name: Install packages for Red Hat distros
   when: ansible_distribution == 'Ubuntu'
   block:
-    - name: ensure packages needed for Epic and role are installed
+    - name: Ensure packages needed for Epic and role are installed
       ansible.builtin.apt:
         name:
           - perl
@@ -141,17 +141,17 @@
         state: present
 
 ### Post package install tasks
-- name: gather package facts
+- name: Gather package facts
   package_facts:
 
 ### systemd tweaks
-- name: load service facts
+- name: Load service facts
   service_facts:
 
-- name: configure EL < 8
+- name: Configure EL < 8
   when: ansible_facts['distribution_major_version'] < '8'
   block:
-    - name: stop and disable tuned
+    - name: Stop and disable tuned
       ansible.builtin.service:
         name: tuned
         state: stopped
@@ -159,7 +159,7 @@
       when: ansible_facts['services']['tuned.service'] is defined
 
     ### Security limits and sysctl config options
-    - name: configure security limits
+    - name: Configure security limits
       ansible.builtin.copy:
         src: limits
         dest: /etc/security/limits.d/99-epic.conf
@@ -167,7 +167,7 @@
         group: root
         mode: 0644
 
-    - name: check and config sysctl
+    - name: Check and config sysctl
       include_tasks: sysctl.yml
       loop:
         - {name: vm.hugetlb_shm_group, value: 10000}
@@ -190,7 +190,7 @@
         - {name: net.ipv4.tcp_keepalive_time, value: 600}
         - {name: net.ipv4.tcp_keepalive_intvl, value: 60}
 
-    - name: configure hugepage size
+    - name: Configure hugepage size
       ansible.posix.sysctl:
         name: vm.nr_hugepages
         value: "{{ nr_hugepages }}"
@@ -199,7 +199,7 @@
         state: present
       when: nr_hugepages is defined
 
-    - name: disable alt+ctrl+del
+    - name: Disable alt+ctrl+del
       ansible.builtin.file:
         src: /dev/null
         dest: /etc/systemd/system/ctrl-alt-del.target
@@ -212,10 +212,10 @@
         backrefs: true
         regexp: '^(GRUB_CMDLINE_LINUX=(?!.*transparent_hugepage)\"[^\"]+)(\".*)'
         line: '\1 transparent_hugepage=never\2'
-      notify: grub-mkconfig
+      notify: Run grub-mkconfig
       when: "'grub' in ansible_facts['packages']"
 
-    - name: copy Epic sudoers file
+    - name: Copy Epic sudoers file
       ansible.builtin.copy:
         src: sudoers
         dest: /etc/sudoers.d/epic
@@ -223,18 +223,20 @@
         group: root
         mode: 0440
 
-- name: configure EL > 7
+- name: Configure EL > 7
   when: ansible_facts['distribution_major_version'] >= '8'
   block:
-    - name: configure hugepage group
+    - name: Configure hugepage group
       ansible.builtin.lineinfile:
         path: /etc/tuned/epic/tuned.conf
         line: vm.hugetlb_shm_group = 10000
         regexp: '^vm.hugetlb_shm_group'
         insertafter: '^[sysctl]$'
 
+    - name: 
+
 ### Directory creation
-- name: create /usr/local/epic
+- name: Create /usr/local/epic
   ansible.builtin.file:
     path: /usr/local/epic
     state: directory
@@ -242,7 +244,7 @@
     group: epicsys
     mode: 0755
 
-- name: create core dump directory
+- name: Create core dump directory
   ansible.builtin.file:
     path: /epic_core
     state: directory
@@ -250,7 +252,7 @@
     group: 10002
     mode: 0777
 
-- name: create epicfiles directory
+- name: Create epicfiles directory
   ansible.builtin.file:
     path: /epicfiles
     state: directory
@@ -258,7 +260,7 @@
     group: root
     mode: 0755
 
-- name: create epic directory
+- name: Create epic directory
   ansible.builtin.file:
     path: /epic
     state: directory
@@ -266,7 +268,7 @@
     group: epicsys
     mode: '2755'
 
-- name: create bin directory
+- name: Create bin directory
   ansible.builtin.file:
     path: /epic/bin
     state: directory
@@ -276,7 +278,7 @@
   tags:
     - epicmenu
 
-- name: create /epic/tmp directory
+- name: Create /epic/tmp directory
   ansible.builtin.file:
     path: /epic/tmp
     state: directory
@@ -284,7 +286,7 @@
     group: epicuser
     mode: '1777'
 
-- name: create /epic/pki
+- name: Create /epic/pki
   ansible.builtin.file:
     path: /epic/pki
     state: directory
@@ -292,7 +294,7 @@
     group: epicsys
     mode: 0755
 
-- name: ensure encryption keys directory exists
+- name: Ensure encryption keys directory exists
   ansible.builtin.file:
     path: /epic/pki/keys
     state: directory
@@ -300,7 +302,7 @@
     group: epicsys
     mode: 0755
 
-- name: set default file context for bin directories
+- name: Set default file context for bin directories
   community.general.sefcontext:
     target: "{{ item }}(/.*)?"
     setype: bin_t
@@ -309,9 +311,9 @@
     - /epic/bin
     - /epic/redalert/bin
   when: ansible_facts['os_family'] == 'RedHat'
-  notify: restorecon epic
+  notify: Run restorecon epic
 
-- name: set default file context for instance bin directories
+- name: Set default file context for instance bin directories
   community.general.sefcontext:
     target: "/epic/{{ item }}/bin(/.*)?"
     setype: bin_t
@@ -320,9 +322,9 @@
   when:
     - odb_instances is defined
     - ansible_facts['os_family'] == 'RedHat'
-  notify: restorecon epic
+  notify: Run restorecon epic
 
-- name: install service files
+- name: Install service files
   ansible.builtin.copy:
     src: "{{ item }}.service"
     dest: /etc/systemd/system/{{ item }}.service
@@ -333,30 +335,30 @@
     - epic@
     - redalert
 
-- name: make sure epic@.service is enabled
+- name: Make sure epic@.service is enabled
   ansible.builtin.systemd:
     name: epic@{{ item }}
     enabled: true
   loop: "{{ odb_instances }}"
   when: useepicatservice
 
-- name: enable redalert.service
+- name: Enable redalert.service
   ansible.builtin.systemd:
     name: redalert
     enabled: true
 
 ### Copy scripts and miscelaneous files
-- name: check sslcert binary
+- name: Check sslcert binary
   ansible.builtin.stat:
     path: /epic/redalert/bin/sslcert
   register: sslcert_bin_stat
 
-- name: check RedAlert conf file
+- name: Check RedAlert conf file
   ansible.builtin.stat:
     path: /epic/redalert/conf/epic.conf
   register: ra_conf_file_stat
 
-- name: get ESMP_TRUSTED_DIR
+- name: Get ESMP_TRUSTED_DIR
   shell: set -o pipefail &
     grep '<ESMP_TRUSTED_DIR>' /epic/redalert/conf/epic.conf | cut -d '>' -f 2 | cut -d '<' -f 1
   register: esmp_trusted_dir
@@ -364,7 +366,7 @@
   changed_when: false
   when: ra_conf_file_stat['stat']['exists']
 
-- name: get contents of ESMP_TRUSTED_DIR
+- name: Get contents of ESMP_TRUSTED_DIR
   find:
     paths: "{{ esmp_trusted_dir['stdout'] }}"
     pattern: '*'
@@ -373,7 +375,7 @@
     - ra_conf_file_stat
     - esmp_trusted_dir['stdout'] | default('')
 
-- name: get CA bundle from uri
+- name: Get CA bundle from uri
   when: ca_bundle is match("https?://.*")
   block:
     - name: copy CA bunle from {{ ca_bundle }}
@@ -387,7 +389,7 @@
         - Update RedAlert CAs
         - Clear RedAlert CAs
 
-- name: get CA bundle from file
+- name: Get CA bundle from file
   when: ca_bundle is not match("https?://.*")
   block:
     - name: check for CA bundle
@@ -397,7 +399,7 @@
       changed_when: false
       check_mode: false
 
-    - name: copy CA certs
+    - name: Copy CA certs
       ansible.builtin.copy:
         src: "{{ ca_bundle }}"
         dest: /epic/pki/{{ ca_bundle | basename }}
@@ -418,7 +420,7 @@
   changed_when: false
   when: ansible_facts['selinux']['status'] == 'enabled'
 
-- name: enable SSH on port 2222 in selinux
+- name: Enable SSH on port 2222 in selinux
   community.general.seport:
     ports: 22, 2222
     proto: tcp
@@ -428,7 +430,7 @@
     - ansible_facts['selinux']['status'] == 'enabled'
     - "'2222' not in ssh_port_t_stat['stdout']"
 
-- name: create /etc/ssh
+- name: Create /etc/ssh
   ansible.builtin.file:
     path: /etc/ssh
     state: directory
@@ -436,60 +438,60 @@
     group: root
     mode: 0755  # noqa risky-file-permissions
 
-- name: disable root login over SSH
+- name: Disable root login over SSH
   ansible.builtin.lineinfile:
     line: PermitRootLogin no
     regexp: '^PermitRootLogin'
     path: /etc/ssh/sshd_config
-  notify: restart_sshd
+  notify: Restart sshd
 
-- name: explicily enable port 22
+- name: Explicily enable port 22
   ansible.builtin.lineinfile:
     line: Port 22
     regexp: '^Port 22$'
     path: /etc/ssh/sshd_config
-  notify: restart_sshd
+  notify: Restart sshd
 
-- name: set sshd to listen on port 2222
+- name: Set sshd to listen on port 2222
   ansible.builtin.lineinfile:
     line: Port 2222
     regexp: '^Port 2222'
     insertafter: '^Port 22$'
     path: /etc/ssh/sshd_config
-  notify: restart_sshd
+  notify: Restart sshd
 
-- name: set port 2222 to sftp only
+- name: Set port 2222 to sftp only
   ansible.builtin.blockinfile:
     marker: "# {mark} ANSIBLE MANAGED BLOCK SFTP Port"
     block: |
       Match LocalPort 2222
         ForceCommand /usr/libexec/openssh/sftp-server -d /epicfiles/
     path: /etc/ssh/sshd_config
-  notify: restart_sshd
+  notify: Restart sshd
 
-- name: set epic menus for groups
+- name: Set epic menus for groups
   ansible.builtin.blockinfile:
     marker: "# {mark} ANSIBLE MANAGED BLOCK epicmenu for {{ item['group'] }}"
     block: |
       Match LocalPort 22 Group {{ item['group'] }}
         ForceCommand /epic/bin/{{ item['menu'] }}
     path: /etc/ssh/sshd_config
-  notify: restart_sshd
+  notify: Restart sshd
   loop: "{{ epicmenu_groups }}"
   when: epicmenu_groups is defined
 
-- name: set epic menus for users
+- name: Set epic menus for users
   ansible.builtin.blockinfile:
     marker: "# {mark} ANSIBLE MANAGED BLOCK epicmenu for {{ item['user'] }}"
     block: |
       Match LocalPort 22 User {{ item['user'] }}
         ForceCommand /epic/bin/{{ item['menu'] }}
     path: /etc/ssh/sshd_config
-  notify: restart_sshd
+  notify: Restart sshd
   loop: "{{ epicmenu_users }}"
   when: epicmenu_users is defined
 
-- name: copy /usr/local/bin files
+- name: Copy /usr/local/bin files
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: /usr/local/bin/{{ item | basename }}
@@ -498,7 +500,7 @@
     mode: 0755
   with_fileglob: localbin/*
 
-- name: create manage_epicuser_group
+- name: Create manage_epicuser_group
   ansible.builtin.template:
     src: manage_epicuser_group.j2
     dest: /usr/local/bin/manage_epicuser_group
@@ -506,14 +508,14 @@
     group: root
     mode: 0775
 
-- name: add cron job for manage_epicuser_group
+- name: Add cron job for manage_epicuser_group
   ansible.builtin.file:
     src: /usr/local/bin/manage_epicuser_group
     dest: /etc/cron.hourly/manage_epicuser_group
     state: link
   when: "'cronie' in ansible_facts['packages']"
 
-- name: add audit lines to PAM files
+- name: Add audit lines to PAM files
   ansible.builtin.lineinfile:
     dest: "{{ item }}"
     state: present
@@ -523,25 +525,25 @@
     - /etc/pam.d/system-auth
     - /etc/pam.d/password-auth
   notify:
-    - restartauditd
+    - Restart auditd
   when: "'audit' in ansible_facts['packages']"
 
 ### Sudoers config
-- name: create working copy of system sudoers file
+- name: Create working copy of system sudoers file
   command: cp -f /etc/sudoers /etc/sudoers.tmp
   changed_when: false
 
-- name: back up sudoers file
+- name: Back up sudoers file
   command: cp -f /etc/sudoers /etc/sudoers.bak
   changed_when: false
 
-- name: remove Defaults requiretty
+- name: Remove Defaults requiretty
   ansible.builtin.lineinfile:
     dest: /etc/sudoers.tmp
     state: absent
     regexp: 'Defaults    requiretty'
 
-- name: check for sudoers differences
+- name: Check for sudoers differences
   command: diff /etc/sudoers.tmp /etc/sudoers
   register: sudoers_diff
   ignore_errors: true
@@ -555,12 +557,12 @@
   changed_when: sudoers_result.rc == 0 and sudoers_diff.rc == 1
 
 ### Setup firewall rules
-- name: refresh service facts
+- name: Refresh service facts
   service_facts:
   tags:
     - firewall
 
-- name: start firewalld
+- name: Start firewalld
   ansible.builtin.systemd:
     name: firewalld
     state: started
@@ -571,7 +573,7 @@
   tags:
     - firewall
 
-- name: ufw started
+- name: UFW started
   ansible.builtin.systemd:
     name: ufw
     state: started
@@ -590,7 +592,7 @@
   tags:
     - firewall
 
-- name: refresh service facts
+- name: Refresh service facts
   service_facts:
   tags:
     - firewall
@@ -598,14 +600,14 @@
 - name: Enable firewall rules on EL
   when: ansible_distribution != 'Ubuntu'
   block:
-    - name: reload firewalld
+    - name: Reload firewalld
       command: firewall-cmd --reload
       changed_when: false
       when: ansible_facts['services']['firewalld.service']['state'] == 'running'
       tags:
         - firewall
 
-    - name: enable dynamic Epic firewall rules
+    - name: Enable dynamic Epic firewall rules
       ansible.posix.firewalld:
         service: "{{ item['name'] }}"
         permanent: true
@@ -628,7 +630,7 @@
 - name: Enable firewall rules on Ubuntu
   when: ansible_distribution == 'Ubuntu'
   block:
-    - name: reload firewalld
+    - name: Reload firewalld
       command: ufw reload
       changed_when: false
       tags:
@@ -647,7 +649,7 @@
       tags:
         - firewall
 
-    - name: enable dynamic Epic firewall rules
+    - name: Enable dynamic Epic firewall rules
       community.general.ufw:
         rule: allow
         name: "{{ item['name'] }}"
@@ -664,14 +666,14 @@
         - firewall
 
 ### Get status of /etc/vmware-tools before trying to copy file there
-- name: get status of /etc/vmware-tools directory
+- name: Get status of /etc/vmware-tools directory
   ansible.builtin.stat:
     path: /etc/vmware-tools
   register: etc_vmwaretools
   changed_when: false
   check_mode: false
 
-- name: copy tools.conf
+- name: Copy tools.conf
   ansible.builtin.copy:
     src: tools.conf
     dest: /etc/vmware-tools/tools.conf
@@ -679,7 +681,7 @@
     group: root
     mode: 0644  # noqa risky-file-permissions
   when: etc_vmwaretools['stat']['exists']
-  notify: restart_vmtools
+  notify: Restart vmtools
 
 - name: Generate private key
   community.crypto.openssl_privatekey:
@@ -702,34 +704,34 @@
     country_name: "{{ epic_csr['c'] }}"
     subject_alt_name: "{{ dnsnames | map('regex_replace', '^', 'DNS:') | list }}"
 
-- name: check for chrony.conf
+- name: Check for chrony.conf
   ansible.builtin.stat:
     path: /etc/chrony.conf
   register: chrony_conf_stat
   changed_when: false
   check_mode: false
 
-- name: update chrony config
+- name: Update chrony config
   when: chrony_conf_stat['stat']['exists']
   block:
-    - name: disable makestep
+    - name: Disable makestep
       ansible.builtin.lineinfile:
         path: /etc/chrony.conf
         regexp: 'makestep'
         line: '#makestep 2'
-    - name: set minsources to 2
+    - name: Set minsources to 2
       ansible.builtin.lineinfile:
         path: /etc/chrony.conf
         regexp: '^minsources'
         line: 'minsources 2'
-    - name: set logchange to 0.5
+    - name: Set logchange to 0.5
       ansible.builtin.lineinfile:
         path: /etc/chrony.conf
         regexp: '^logchange'
         line: 'logchange 0.5'
 
 ### epicmenu config
-- name: create conf directory
+- name: Create conf directory
   ansible.builtin.file:
     path: /epic/conf
     state: directory
@@ -739,7 +741,7 @@
   tags:
     - epicmenu
 
-- name: install epicmenu confs
+- name: Install epicmenu confs
   ansible.builtin.template:
     src: templates/epicmenu/{{ item | basename }}
     dest: /epic/conf/{{ (item | basename | splitext)[0] }}
@@ -751,7 +753,7 @@
   tags:
     - epicmenu
 
-- name: ensure links exists for epicmenus
+- name: Ensure links exists for epicmenus
   ansible.builtin.file:
     path: /epic/bin/{{ ((item | basename | splitext)[0] | splitext)[0] }}
     src: epicmenu
@@ -762,7 +764,7 @@
   tags:
     - epicmenu
 
-- name: install environment epicmenus
+- name: Install environment epicmenus
   include_tasks: epicmenu.yml
   loop: "{{ epic_environments }}"
   loop_control:

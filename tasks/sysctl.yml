@@ -1,10 +1,10 @@
 ---
-- name: check for {{ item['name'] }} sysctl setting
+- name: Check for {{ item['name'] }} sysctl setting
   ansible.builtin.stat:
     path: /proc/sys/{{ item['name'] | replace('.','/') }}
   register: sysctl_setting
 
-- name: configure {{ item['name'] }} sysctl
+- name: Configure {{ item['name'] }} sysctl
   ansible.posix.sysctl:
     name: "{{ item['name'] }}"
     value: "{{ item['value'] }}"

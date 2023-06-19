@@ -1,5 +1,5 @@
 ---
-- name: create conf directory
+- name: Create conf directory
   ansible.builtin.file:
     path: /epic/{{ EpicEnvironment['Instance'] | lower }}/conf
     state: directory
@@ -9,7 +9,7 @@
   tags:
     - epicmenu
 
-- name: create bin directory
+- name: Create bin directory
   ansible.builtin.file:
     path: /epic/{{ EpicEnvironment['Instance'] | lower }}/bin
     state: directory
@@ -19,7 +19,7 @@
   tags:
     - epicmenu
 
-- name: install epicmenu confs
+- name: Install epicmenu confs
   ansible.builtin.template:
     src: templates/emenv/{{ ((item | basename | splitext)[0] | splitext)[0] }}.conf.j2
     dest: /epic/{{ EpicEnvironment['Instance'] | lower }}/conf/{{ ((item | basename | splitext)[0] | splitext)[0] }}.conf
@@ -31,7 +31,7 @@
   tags:
     - epicmenu
 
-- name: ensure links exists for epicmenus
+- name: Ensure links exists for epicmenus
   ansible.builtin.file:
     path: /epic/{{ EpicEnvironment['Instance'] | lower }}/bin/{{ ((item | basename | splitext)[0] | splitext)[0] }}
     src: epicmenu

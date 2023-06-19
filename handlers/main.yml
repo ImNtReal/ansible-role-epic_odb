@@ -1,17 +1,17 @@
 ---
-- name: grub-mkconfig
+- name: Run grub-mkconfig
   command: grub2-mkconfig -o /boot/grub2/grub.cfg
 
-- name: restartauditd
+- name: Restart auditd
   command: service auditd restart  # noqa 303
 
-- name: restart_sshd
+- name: Restart sshd
   ansible.builtin.service:
     name: sshd
     state: restarted
   when: ansible_facts['services']['sshd'] is defined
 
-- name: restart_vmtools
+- name: Restart vmtools
   ansible.builtin.service:
     name: vmtoolsd
     state: restarted
@@ -29,5 +29,5 @@
   become_user: epicadm
   when: sslcert_bin_stat['stat']['exists']
 
-- name: restorecon epic
+- name: Run restorecon epic
   command: restorecon -Rv /epic
