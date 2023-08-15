@@ -16,38 +16,38 @@ epic_csr:
 cachegrp: false
 
 epic_users:
-  - {user: epicadm,
-     comment: "Epic Admin",
-     group: epicsys,
-     groups: "epicuser,irisusr,dmngrp",
-     uid: 10000,
-     state: present,
-     password: "{{ epic_passwords['epicadm'] }}"}
-  - {user: epicdmn,
-     comment: "Epic Daemon",
-     group: epicuser,
-     groups: dmngrp,
-     uid: 10001,
-     state: present,
-     password: "{{ epic_passwords['epicdmn'] }}"}
-  - {user: epicsupt,
-     comment: "Epic Tempmlate",
-     group: epicuser,
-     groups: users,
-     uid: 10002,
-     state: present,
-     password: "{{ epic_passwords['epicsupt'] }}"}
-  - {user: epictxt,
-     comment: "Epic Text",
-     group: epicuser,
-     groups: users,
-     uid: 10003,
-     state: present,
-     password: "{{ epic_passwords['epictxt'] }}"}
-  - {user: iscagent,
-     comment: "Epic iscagent",
-     group: iscagent,
-     groups: users,
-     uid: 10004,
-     state: present,
-     password: "{{ epic_passwords['iscagent'] }}"}
+  - user: epicadm
+    comment: "Epic Admin"
+    group: epicsys
+    groups: "epicuser,irisusr,dmngrp"
+    uid: 10000
+    state: present
+    password: "{{ epic_passwords['epicadm'] }}"
+  - user: epicdmn
+    comment: "Epic Daemon"
+    group: epicuser
+    groups: dmngrp
+    uid: 10001
+    state: present
+    password: "{{ epic_passwords['epicdmn'] }}"
+  - user: epicsupt
+    comment: "Epic Tempmlate"
+    group: epicuser
+    groups: users
+    uid: 10002
+    state: present
+    password: "{{ epic_passwords['epicsupt'] }}"
+  - user: epictxt
+    comment: "Epic Text"
+    group: epicuser
+    groups: users
+    uid: 10003
+    state: present
+    password: "{{ epic_passwords['epictxt'] }}"
+  - user: iscagent
+    comment: "Epic iscagent"
+    group: iscagent
+    groups: users
+    uid: 10004
+    state: present
+    password: "{{ epic_passwords['iscagent'] }}"

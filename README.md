@@ -50,7 +50,8 @@ inventory:
           - 'prd'
 
         epic_environments:
-          - { Instance: 'PRD', Environment: 'PRD' }
+          - Instance: 'PRD'
+            Environment: 'PRD'
 
         nr_hugepages: 112763
 
@@ -72,41 +73,42 @@ inventory:
           - name: epiccomm
             description: EpicComm
             ports:
-              - {port: 6050}
+              - port: 6050
           - name: licensing
             description: Epic Licensing Server
             ports:
-              - {port: 4001, protocol: 'udp'}
+              - port: 4001
+                protocol: 'udp'
           - name: procedure-logs
             description: Epic Procedure Logs
             ports:
-              - {port: 11913}
+              - port: 11913
           - name: redalert
             description: Epic Red Alert Monitoring Agent
             ports:
-              - {port: 10443}
+              - port: 10443
           - name: isc-mirroring
             description: Cache' ISC Agent Mirroring
             ports:
-              - {port: 2188}
+              - port: 2188
           - name: superserver
             description: Cache' Superserver
             ports:
-              - {port: 1950}
+              - port: 1950
           - name: webserver
             description: Cache' Webserver
             ports:
-              - {port: 4950}
+              - port: 4950
           - name: bridges
             description: Epic Bridges
             ports:
-              - {port: 1751}
-              - {port: 3101}
+              - port: 1751
+              - port: 3101
           - name: datacourier
             description: Epic Datacourier
             ports:
-              - {port: 65000}
-              - {port: 65111}
+              - port: 65000
+              - port: 65111
 
 playbook:
 
