@@ -12,7 +12,7 @@ case $1 in
   'thaw')
     /usr/local/bin/thaw_all_cache_instances.sh
     ;;
-  'freezefail')
+  'freezeFail')
     /usr/local/bin/thaw_all_cache_instances.sh
     ;;
   *)
