@@ -1,0 +1,22 @@
+#! /usr/bin/env bash
+
+if [[ $# != 1 ]]; then
+  echo 'This script requires exactly one argument.'
+  exit 1
+fi
+
+case $1 in
+  'freeze')
+    /usr/local/bin/freeze_all_cache_instances.sh
+    ;;
+  'thaw')
+    /usr/local/bin/thaw_all_cache_instances.sh
+    ;;
+  'freezefail')
+    /usr/local/bin/thaw_all_cache_instances.sh
+    ;;
+  *)
+    echo "Invalid argument $1"
+    exit 1
+    ;;
+esac

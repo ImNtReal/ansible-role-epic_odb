@@ -815,3 +815,21 @@
     loop_var: EpicEnvironment
   tags:
     - epicmenu
+
+- name: Create /etc/vmware-tools/backupScripts.d
+  ansible.builtin.file:
+    path: /etc/vmware-tools/backupScripts.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  when: ansible_virtualization_type == 'VMware'
+
+- name: Copy quiesce script
+  ansible.builtin.copy:
+    src: quiesce
+    dest: /etc/vmware-tools/backupScripts.d/quiesce
+    owner: root
+    group: root
+    mode: 0755
+  when: ansible_virtualization_type == 'VMware'
