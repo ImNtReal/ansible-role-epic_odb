@@ -9,9 +9,9 @@
       become: true
       become_user: epicadm
   rescue:
-    - name: "Create user {{ iris_user['username'] }}"
+    - name: Create user {{ iris_user['username'] }}
       ansible.builtin.command: |
-        /epic/{{ EpicEnvironment['Instance'] | lower }}/bin/cusers --add --users {{ iris_user['username'] }} --roles {{ iris_user['roles'] | join(',') }}"
+        /epic/{{ EpicEnvironment['Instance'] | lower }}/bin/cusers --add --users {{ iris_user['username'] }} --roles {{ iris_user['roles'] | join(',') }}
       become: true
       become_user: epicadm
     - name: Get user info for {{ iris_user['username'] }}
