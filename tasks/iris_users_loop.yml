@@ -1,0 +1,15 @@
+---
+- name: Ensure IRIS is running
+  ansible.builtin.shell:
+    iris view {{ EpicEnvironment['Instance'] }} | tr -s ' ' | grep 'status:' | cut -d ',' -f 1 | cut -d ' ' -f 2
+  check_mode: false
+  changed_when: false
+  register: iris_instance_status
+  become: true
+  become_user: epicadm
+
+- include_tasks: iris_users.yml
+  loop: "{{ iris_users }}"
+  loop_control:
+    loop_var: iris_user
+  when: running in iris_instance_status['stdout']

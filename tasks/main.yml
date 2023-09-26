@@ -816,6 +816,12 @@
   tags:
     - epicmenu
 
+- name: Manage local IRIS users
+  include_tasks: iris_users_loop.yml
+  loop: "{{ epic_environments }}"
+  loop_control:
+    loop_var: EpicEnvironment
+
 - name: Create /etc/vmware-tools/backupScripts.d
   ansible.builtin.file:
     path: /etc/vmware-tools/backupScripts.d
