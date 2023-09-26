@@ -12,4 +12,4 @@
   loop: "{{ iris_users }}"
   loop_control:
     loop_var: iris_user
-  when: running in iris_instance_status['stdout']
+  when: "'running' in iris_instance_status['stdout']"
