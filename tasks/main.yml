@@ -461,6 +461,10 @@
   when: epic_esmp_password is defined
   block:
 
+    - name: Ensure password is decrypted
+      ansible.builtin.set_fact:
+        internal_esmp_password: "{{ epic_esmp_password }}"
+
     - name: Check for key.conf
       ansible.builtin.stat:
         path: /epic/redalert/conf/key.conf
@@ -480,7 +484,7 @@
     - name: Inject ESMP password
       ansible.builtin.lineinfile:
         path: /epic/redalert/conf/key.conf
-        line: <KEY>{{ epic_esmp_password | password_hash }}</KEY>
+        line: <KEY>{{ internal_esmp_password | password_hash }}</KEY>
         regexp: ^<KEY>
         insertafter: <xml>
         insertbefore: </xml>
