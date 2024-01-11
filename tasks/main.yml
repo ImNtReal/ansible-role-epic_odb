@@ -402,6 +402,7 @@
     path: /epic/redalert/conf/epic.conf
   register: ra_conf_file_stat
 
+### TLS CA stuff
 - name: Get ESMP_TRUSTED_DIR
   shell: set -o pipefail &
     grep '<ESMP_TRUSTED_DIR>' /epic/redalert/conf/epic.conf | cut -d '>' -f 2 | cut -d '<' -f 1
@@ -454,6 +455,39 @@
         - Update RedAlert CAs
         - Clear RedAlert CAs
       when: ca_bundle_stat['stat']['exists']
+
+### Set ESMP password
+- name: Set ESMP password
+  block:
+  when: epic_esmp_password is defined
+
+    - name: Check for key.conf
+      ansible.builtin.stat:
+        path: /epic/redalert/conf/key.conf
+      check_mode: false
+      changed_when: false
+      register: redalert_key_stat
+
+    - name: Copy stub when key.conf doesn't exist
+      ansible.builtin.copy:
+        src: key.conf
+        dest: /epic/redalert/conf/key.conf
+        owner: epicadm
+        group: epicsys
+        mode: 0400
+      when: not redalert_key_stat['exists']
+
+    - name: Inject ESMP password
+      ansible.builtin.lineinfile:
+        path: /epic/redalert/conf/key.conf
+        line: <KEY>{{ epic_esmp_password | password_hash }}</KEY>
+        regexp: ^<KEY>
+        insertafter: <xml>
+        insertbefore: </xml>
+        owner: epicadm
+        group: epicsys
+        mode: 0400
+      notify: Restart ESMP
 
 - name: Get selinux port tags for ssh_port_t
   shell: set -o pipefail |
