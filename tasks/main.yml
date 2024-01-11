@@ -475,7 +475,7 @@
         owner: epicadm
         group: epicsys
         mode: 0400
-      when: not redalert_key_stat['exists']
+      when: not redalert_key_stat['stat']['exists']
 
     - name: Inject ESMP password
       ansible.builtin.lineinfile:
