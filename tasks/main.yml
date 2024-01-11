@@ -554,7 +554,7 @@
   ansible.builtin.blockinfile:
     marker: "# {mark} ANSIBLE MANAGED BLOCK epicmenu for {{ item['group'] }}"
     block: |
-      Match LocalPort 22 Group {{ item['group'] }} Username !{{ epicmenu_exclusions | join(' !') }}
+      Match LocalPort 22 Group {{ item['group'] }} Username !{{ epicmenu_exclusions | join(', !') }}
         ForceCommand /epic/bin/{{ item['menu'] }}
     path: /etc/ssh/sshd_config
   notify: Restart sshd
