@@ -485,7 +485,7 @@
       ansible.builtin.lineinfile:
         path: /epic/redalert/conf/key.conf
         line: <KEY>{{ internal_esmp_password | password_hash }}</KEY>
-        regexp: ^<KEY>
+        regexp: ^\s*<KEY>
         insertbefore: </xml>
         owner: epicadm
         group: epicsys
