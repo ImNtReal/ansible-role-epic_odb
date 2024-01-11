@@ -484,7 +484,7 @@
     - name: Inject ESMP password
       ansible.builtin.lineinfile:
         path: /epic/redalert/conf/key.conf
-        line: <KEY>{{ internal_esmp_password | password_hash }}</KEY>
+        line: '  <KEY>{{ internal_esmp_password | password_hash }}</KEY>'
         regexp: ^\s*<KEY>
         insertbefore: </xml>
         owner: epicadm
