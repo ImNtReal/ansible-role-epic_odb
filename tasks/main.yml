@@ -486,7 +486,6 @@
         path: /epic/redalert/conf/key.conf
         line: <KEY>{{ internal_esmp_password | password_hash }}</KEY>
         regexp: ^<KEY>
-        insertafter: <xml>
         insertbefore: </xml>
         owner: epicadm
         group: epicsys
