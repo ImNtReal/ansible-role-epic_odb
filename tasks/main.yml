@@ -458,8 +458,8 @@
 
 ### Set ESMP password
 - name: Set ESMP password
-  block:
   when: epic_esmp_password is defined
+  block:
 
     - name: Check for key.conf
       ansible.builtin.stat:
