@@ -559,7 +559,6 @@
     path: /etc/ssh/sshd_config
     insertbefore: ANSIBLE MANAGED BLOCK epicmenu for
   notify: Restart sshd
-  loop: "{{ epicmenu_groups }}"
   when: epicmenu_exclusions is defined
 
 - name: Set epic menus for groups
