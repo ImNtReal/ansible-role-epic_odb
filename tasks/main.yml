@@ -551,13 +551,12 @@
   notify: Restart sshd
 
 - name: Set epic menu exclusions 
-  ansible.builtin.blockinfile:
-    marker: "# {mark} ANSIBLE MANAGED BLOCK epicmenu exclusions"
-    block: |
-      Match LocalPort 22 User {{ epicmenu_exclusions | join(',') }}
-      
+  ansible.builtin.lineinfile:
+    line: Match LocalPort 22 User {{ epicmenu_exclusions | join(',') }}
+    regexp: '^Match LocalPort 22 User'
     path: /etc/ssh/sshd_config
     insertbefore: '^# BEGIN ANSIBLE MANAGED BLOCK epicmenu for'
+    firstmatch: true
   notify: Restart sshd
   when: epicmenu_exclusions is defined
 
