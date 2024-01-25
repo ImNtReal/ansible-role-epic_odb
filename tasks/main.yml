@@ -555,7 +555,7 @@
     marker: "# {mark} ANSIBLE MANAGED BLOCK epicmenu exclusions"
     block: |
       Match LocalPort 22 User {{ epicmenu_exclusions | join(',') }}
-        ForceCommand /bin/bash
+      
     path: /etc/ssh/sshd_config
     insertbefore: '^# BEGIN ANSIBLE MANAGED BLOCK epicmenu for'
   notify: Restart sshd
