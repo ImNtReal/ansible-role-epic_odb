@@ -51,3 +51,23 @@ epic_users:
     uid: 10004
     state: present
     password: "{{ epic_passwords['iscagent'] }}"
+
+epic_groups:
+  - name: 'epicsys'
+    gid: 10000
+  - name: 'epicuser'
+    gid: 10001
+  - name: 'dmngrp'
+    gid: 10003
+  - name: 'iscagent'
+    gid: 10004
+  - name: 'epicdmn'
+    gid: 10005
+  - name: 'epicis'
+    gid: 10006
+  - name: 'epicts'
+    gid: 10007
+  - name: 'epictxt'
+    gid: 10008
+  - name: 'epicsts'
+    gid: 10009

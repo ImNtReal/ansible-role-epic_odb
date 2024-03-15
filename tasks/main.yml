@@ -5,27 +5,20 @@
     name: "{{ item['name'] }}"
     gid: "{{ item['gid'] }}"
     state: present
-  loop:
-    - name: 'epicsys'
-      gid: 10000
-    - name: 'epicuser'
-      gid: 10001
-    - name: 'dmngrp'
-      gid: 10003
-    - name: 'iscagent'
-      gid: 10004
+  loop: "{{ epic_groups }}"
+
 
 - name: Create cachegrp
   ansible.builtin.group:
     name: cachegrp
-    gid: 10002
+    gid: 1014
     state: present
   when: cachegrp
 
 - name: Create irisusr
   ansible.builtin.group:
     name: irisusr
-    gid: 10002
+    gid: 1011
     state: present
   when: not cachegrp
 
@@ -268,7 +261,7 @@
         ansible_system_vendor == 'Microsoft Azure' or
         ansible_system_vendor == 'GCE'
       notify: Set tuned profile
-      
+
     - name: Configure unknown_nmi_panic for public clouds
       community.general.ini_file:
         path: /etc/tuned/epic/tuned.conf
@@ -330,20 +323,43 @@
     group: epicuser
     mode: '1777'
 
-- name: Create /epic/pki
+- name: Create PKI directories /epic/pki
   ansible.builtin.file:
-    path: /epic/pki
+    path: "{{ item }}"
+    state: directory
+    owner: epicadm
+    group: epicsys
+    mode: 0755
+  loop:
+    - "/epic/pki"
+    - "/epic/pki/certs"
+    - "/epic/pki/certs/esmp"
+    - "/epic/pki/keys"
+    - "/epic/pki/ca"
+
+
+- name: Create /epic/work
+  ansible.builtin.file:
+    path: /epic/work
     state: directory
     owner: epicadm
     group: epicsys
     mode: 0755
 
-- name: Ensure encryption keys directory exists
+- name: Create /epic/logs
   ansible.builtin.file:
-    path: /epic/pki/keys
+    path: /epic/logs
     state: directory
     owner: epicadm
-    group: epicsys
+    group: epicuser
+    mode: 0755
+
+- name: Create /epic/conf
+  ansible.builtin.file:
+    path: /epic/conf
+    state: directory
+    owner: epicadm
+    group: epicuser
     mode: 0755
 
 - name: Set default file context for bin directories
@@ -359,6 +375,17 @@
 
 - name: Set default file context for instance bin directories
   community.general.sefcontext:
+    target: "/epic/{{ item }}/bin"
+    setype: bin_t
+    state: present
+  loop: "{{ odb_instances }}"
+  when:
+    - odb_instances is defined
+    - ansible_facts['os_family'] == 'RedHat'
+  notify: Run restorecon epic
+
+- name: Set default file context for instance bin directories
+  community.general.sefcontext:
     target: "/epic/{{ item }}/bin(/.*)?"
     setype: bin_t
     state: present
@@ -367,6 +394,31 @@
     - odb_instances is defined
     - ansible_facts['os_family'] == 'RedHat'
   notify: Run restorecon epic
+
+
+- name: Set the permissions for irisstart
+  community.general.file:
+    path: "/epic/{{ item|lower }}/irissys/bin/irisstart"
+    owner: root
+    group: epicsys
+    mode: '04610' # also works
+    state: file
+  loop: "{{ odb_instances }}"
+  when:
+    - odb_instances is defined
+    - ansible_facts['os_family'] == 'RedHat'
+
+- name: Set the permissions for irisstop
+  community.general.file:
+    path: "/epic/{{ item|lower }}/irissys/bin/irisstop"
+    owner: root
+    group: epicsys
+    mode: '04610' # also works
+    state: file
+  loop: "{{ odb_instances }}"
+  when:
+    - odb_instances is defined
+    - ansible_facts['os_family'] == 'RedHat'
 
 - name: Install service files
   ansible.builtin.copy:
@@ -402,7 +454,6 @@
     path: /epic/redalert/conf/epic.conf
   register: ra_conf_file_stat
 
-### TLS CA stuff
 - name: Get ESMP_TRUSTED_DIR
   shell: set -o pipefail &
     grep '<ESMP_TRUSTED_DIR>' /epic/redalert/conf/epic.conf | cut -d '>' -f 2 | cut -d '<' -f 1
@@ -426,7 +477,7 @@
     - name: copy CA bunle from {{ ca_bundle }}
       ansible.builtin.copy:
         content: "{{ lookup('ansible.builtin.url', ca_bundle, split_lines=false) }}"
-        dest: /epic/pki/{{ ca_bundle | basename }}
+        dest: /epic/pki/ca/{{ ca_bundle | basename }}
         owner: epicadm
         group: epicsys
         mode: 0644
@@ -447,7 +498,7 @@
     - name: Copy CA certs
       ansible.builtin.copy:
         src: "{{ ca_bundle }}"
-        dest: /epic/pki/{{ ca_bundle | basename }}
+        dest: /epic/pki/ca/{{ ca_bundle | basename }}
         owner: epicadm
         group: epicsys
         mode: 0644
@@ -455,42 +506,6 @@
         - Update RedAlert CAs
         - Clear RedAlert CAs
       when: ca_bundle_stat['stat']['exists']
-
-### Set ESMP password
-- name: Set ESMP password
-  when: epic_esmp_password is defined
-  block:
-
-    - name: Ensure password is decrypted
-      ansible.builtin.set_fact:
-        internal_esmp_password: "{{ epic_esmp_password }}"
-
-    - name: Check for key.conf
-      ansible.builtin.stat:
-        path: /epic/redalert/conf/key.conf
-      check_mode: false
-      changed_when: false
-      register: redalert_key_stat
-
-    - name: Copy stub when key.conf doesn't exist
-      ansible.builtin.copy:
-        src: key.conf
-        dest: /epic/redalert/conf/key.conf
-        owner: epicadm
-        group: epicsys
-        mode: 0400
-      when: not redalert_key_stat['stat']['exists']
-
-    - name: Inject ESMP password
-      ansible.builtin.lineinfile:
-        path: /epic/redalert/conf/key.conf
-        line: '  <KEY>{{ internal_esmp_password | password_hash }}</KEY>'
-        regexp: ^\s*<KEY>
-        insertbefore: </xml>
-        owner: epicadm
-        group: epicsys
-        mode: 0400
-      notify: Restart ESMP
 
 - name: Get selinux port tags for ssh_port_t
   shell: set -o pipefail |
@@ -550,21 +565,11 @@
     path: /etc/ssh/sshd_config
   notify: Restart sshd
 
-- name: Set epic menu exclusions 
-  ansible.builtin.lineinfile:
-    line: Match LocalPort 22 User {{ epicmenu_exclusions | join(',') }}
-    regexp: '^Match LocalPort 22 User'
-    path: /etc/ssh/sshd_config
-    insertbefore: '^# BEGIN ANSIBLE MANAGED BLOCK epicmenu for'
-    firstmatch: true
-  notify: Restart sshd
-  when: epicmenu_exclusions is defined
-
 - name: Set epic menus for groups
   ansible.builtin.blockinfile:
     marker: "# {mark} ANSIBLE MANAGED BLOCK epicmenu for {{ item['group'] }}"
     block: |
-      Match LocalPort 22 Group {{ item['group'] }} User *,!{{ epicmenu_exclusions | join(',!') }}
+      Match LocalPort 22 Group {{ item['group'] }}
         ForceCommand /epic/bin/{{ item['menu'] }}
     path: /etc/ssh/sshd_config
   notify: Restart sshd
