@@ -454,6 +454,28 @@
     path: /epic/redalert/conf/epic.conf
   register: ra_conf_file_stat
 
+### TLS/PKI setup
+- name: Generate private key
+  community.crypto.openssl_privatekey:
+    path: /epic/pki/keys/private.key
+    passphrase: "{{ private_key_passphrase | default(omit) }}"
+    cipher: auto
+    owner: epicadm
+    group: epicsys
+
+- name: Generate CSR
+  community.crypto.openssl_csr:
+    path: /epic/pki/{{ ansible_hostname }}.csr
+    privatekey_path: /epic/pki/keys/private.key
+    privatekey_passphrase: "{{ private_key_passphrase | default(omit) }}"
+    common_name: '{{ ansible_fqdn }}'
+    organizational_unit_name: "{{ epic_csr['ou'] }}"
+    organization_name: "{{ epic_csr['o'] }}"
+    locality_name: "{{ epic_csr['l'] }}"
+    state_or_province_name: "{{ epic_csr['s'] }}"
+    country_name: "{{ epic_csr['c'] }}"
+    subject_alt_name: "{{ dnsnames | map('regex_replace', '^', 'DNS:') | list }}"
+
 - name: Get ESMP_TRUSTED_DIR
   shell: set -o pipefail &
     grep '<ESMP_TRUSTED_DIR>' /epic/redalert/conf/epic.conf | cut -d '>' -f 2 | cut -d '<' -f 1
