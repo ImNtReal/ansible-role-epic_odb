@@ -529,6 +529,42 @@
         - Clear RedAlert CAs
       when: ca_bundle_stat['stat']['exists']
 
+### Set ESMP password
+- name: Set ESMP password
+  when: epic_esmp_password is defined
+  block:
+
+    - name: Ensure password is decrypted
+      ansible.builtin.set_fact:
+        internal_esmp_password: "{{ epic_esmp_password }}"
+
+    - name: Check for key.conf
+      ansible.builtin.stat:
+        path: /epic/redalert/conf/key.conf
+      check_mode: false
+      changed_when: false
+      register: redalert_key_stat
+
+    - name: Copy stub when key.conf doesn't exist
+      ansible.builtin.copy:
+        src: key.conf
+        dest: /epic/redalert/conf/key.conf
+        owner: epicadm
+        group: epicsys
+        mode: 0400
+      when: not redalert_key_stat['stat']['exists']
+
+    - name: Inject ESMP password
+      ansible.builtin.lineinfile:
+        path: /epic/redalert/conf/key.conf
+        line: '  <KEY>{{ internal_esmp_password | password_hash }}</KEY>'
+        regexp: ^\s*<KEY>
+        insertbefore: </xml>
+        owner: epicadm
+        group: epicsys
+        mode: 0400
+      notify: Restart ESMP
+
 - name: Get selinux port tags for ssh_port_t
   shell: set -o pipefail |
     /sbin/semanage port -l |
