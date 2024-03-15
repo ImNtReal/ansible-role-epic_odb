@@ -41,6 +41,10 @@ cachegrp: false
 cachegrp_gid: 10002
 irisuser_gid: 10002
 
+tuned_hugepages:
+  hugepagesz: 1G
+  hugepages: 93
+
 epic_users:
   - user: epicadm
     comment: "Epic Admin"

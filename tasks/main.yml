@@ -145,6 +145,7 @@
 - name: Load service facts
   service_facts:
 
+### This if for EL 7
 - name: Configure EL < 8
   when: ansible_facts['distribution_major_version'] < '8'
   block:
@@ -239,15 +240,32 @@
         group: root
         mode: 0440
 
+### This if for EL 8 and above
 - name: Configure EL > 7
   when: ansible_facts['distribution_major_version'] >= '8'
   block:
-    - name: Configure hugepage group
+    - name: Configure settings group
+      community.general.ini_file:
+        path: /etc/tuned/epic/tuned.conf
+        section: variables
+        option: vm.hugetlb_shm_group
+        value: 10000
+      notify: Set tuned profile
+
+    - name: Configure hugepage settingsz
       community.general.ini_file:
         path: /etc/tuned/epic/tuned.conf
         section: sysctl
-        option: vm.hugetlb_shm_group
-        value: 10000
+        option: hugepagesz
+        value: "{{ tuned_hugepages.hugepagesz }}"
+      notify: Set tuned profile
+
+    - name: Configure hugepage settings
+      community.general.ini_file:
+        path: /etc/tuned/epic/tuned.conf
+        section: sysctl
+        option: hugepages
+        value: "{{ tuned_hugepages.hugepages }}"
       notify: Set tuned profile
 
     - name: Configure nosmt for public clouds
