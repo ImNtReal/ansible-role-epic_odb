@@ -38,6 +38,9 @@ epic_csr:
 
 cachegrp: false
 
+cachegrp_gid: 10002
+irisuser_gid: 10002
+
 epic_users:
   - user: epicadm
     comment: "Epic Admin"

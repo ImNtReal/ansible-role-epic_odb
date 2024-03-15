@@ -34,3 +34,8 @@
 
 - name: Set tuned profile
   command: tuned-adm profile epic
+
+- name: Restart ESMP
+  command: /epic/redalert/bin/esmp --restart
+  become: true
+  become_user: epicadm
