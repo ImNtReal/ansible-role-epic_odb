@@ -1,5 +1,6 @@
 ---
-- block:
+- name: Make Iris users
+  block:
     - name: Get user info for {{ iris_user['username'] }}
       ansible.builtin.command: |
         /epic/{{ EpicEnvironment['Instance'] | lower }}/bin/cusers --list --parseable --users {{ iris_user['username'] }}
@@ -14,6 +15,8 @@
         /epic/{{ EpicEnvironment['Instance'] | lower }}/bin/cusers --add --users {{ iris_user['username'] }} --roles {{ iris_user['roles'] | join(',') }}
       become: true
       become_user: epicadm
+      changed_when: false
+      check_mode: false
     - name: Get user info for {{ iris_user['username'] }}
       ansible.builtin.command: |
         /epic/{{ EpicEnvironment['Instance'] | lower }}/bin/cusers --list --parseable --users {{ iris_user['username'] }}
@@ -24,7 +27,7 @@
       become_user: epicadm
 
 - name: Get user roles
-  set_fact:
+  ansible.builtin.set_fact:
     user_roles: "{{ user_info['stdout_lines'][-1].split('^')[-1].split(',') }}"
 
 - name: Adjust user roles to match inventory

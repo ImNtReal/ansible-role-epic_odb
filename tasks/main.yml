@@ -5,27 +5,20 @@
     name: "{{ item['name'] }}"
     gid: "{{ item['gid'] }}"
     state: present
-  loop:
-    - name: 'epicsys'
-      gid: 10000
-    - name: 'epicuser'
-      gid: 10001
-    - name: 'dmngrp'
-      gid: 10003
-    - name: 'iscagent'
-      gid: 10004
+  loop: "{{ epic_groups }}"
+
 
 - name: Create cachegrp
   ansible.builtin.group:
     name: cachegrp
-    gid: 10002
+    gid: "{{ cachegrp_gid }}"
     state: present
   when: cachegrp
 
 - name: Create irisusr
   ansible.builtin.group:
     name: irisusr
-    gid: 10002
+    gid: "{{ irisuser_gid }}"
     state: present
   when: not cachegrp
 
@@ -146,12 +139,13 @@
 
 ### Post package install tasks
 - name: Gather package facts
-  package_facts:
+  ansible.builtin.package_facts:
 
 ### systemd tweaks
 - name: Load service facts
-  service_facts:
+  ansible.builtin.service_facts:
 
+### This if for EL 7
 - name: Configure EL < 8
   when: ansible_facts['distribution_major_version'] < '8'
   block:
@@ -169,10 +163,10 @@
         dest: /etc/security/limits.d/99-epic.conf
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
 
     - name: Check and config sysctl
-      include_tasks: sysctl.yml
+      ansible.builtin.include_tasks: sysctl.yml
       loop:
         - name: vm.hugetlb_shm_group
           value: 10000
@@ -244,17 +238,34 @@
         dest: /etc/sudoers.d/epic
         owner: root
         group: root
-        mode: 0440
+        mode: "0440"
 
+### This if for EL 8 and above
 - name: Configure EL > 7
   when: ansible_facts['distribution_major_version'] >= '8'
   block:
-    - name: Configure hugepage group
+    - name: Configure settings group
+      community.general.ini_file:
+        path: /etc/tuned/epic/tuned.conf
+        section: variables
+        option: vm.hugetlb_shm_group
+        value: 10000
+      notify: Set tuned profile
+
+    - name: Configure hugepage settingsz
       community.general.ini_file:
         path: /etc/tuned/epic/tuned.conf
         section: sysctl
-        option: vm.hugetlb_shm_group
-        value: 10000
+        option: hugepagesz
+        value: "{{ tuned_hugepages.hugepagesz }}"
+      notify: Set tuned profile
+
+    - name: Configure hugepage settings
+      community.general.ini_file:
+        path: /etc/tuned/epic/tuned.conf
+        section: sysctl
+        option: hugepages
+        value: "{{ tuned_hugepages.hugepages }}"
       notify: Set tuned profile
 
     - name: Configure nosmt for public clouds
@@ -268,7 +279,7 @@
         ansible_system_vendor == 'Microsoft Azure' or
         ansible_system_vendor == 'GCE'
       notify: Set tuned profile
-      
+
     - name: Configure unknown_nmi_panic for public clouds
       community.general.ini_file:
         path: /etc/tuned/epic/tuned.conf
@@ -286,15 +297,15 @@
     state: directory
     owner: epicadm
     group: epicsys
-    mode: 0755
+    mode: "0755"
 
 - name: Create core dump directory
   ansible.builtin.file:
     path: /epic_core
     state: directory
     owner: epicadm
-    group: 10002
-    mode: 0777
+    group: "10002"
+    mode: "0777"
 
 - name: Create epicfiles directory
   ansible.builtin.file:
@@ -302,7 +313,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
 
 - name: Create epic directory
   ansible.builtin.file:
@@ -318,7 +329,7 @@
     state: directory
     owner: epicadm
     group: epicuser
-    mode: 0755
+    mode: "0755"
   tags:
     - epicmenu
 
@@ -330,25 +341,48 @@
     group: epicuser
     mode: '1777'
 
-- name: Create /epic/pki
+- name: Create PKI directories /epic/pki
   ansible.builtin.file:
-    path: /epic/pki
+    path: "{{ item }}"
     state: directory
     owner: epicadm
     group: epicsys
-    mode: 0755
+    mode: "0755"
+  loop:
+    - "/epic/pki"
+    - "/epic/pki/certs"
+    - "/epic/pki/certs/esmp"
+    - "/epic/pki/keys"
+    - "/epic/pki/ca"
 
-- name: Ensure encryption keys directory exists
+
+- name: Create /epic/work
   ansible.builtin.file:
-    path: /epic/pki/keys
+    path: /epic/work
     state: directory
     owner: epicadm
     group: epicsys
-    mode: 0755
+    mode: "0755"
+
+- name: Create /epic/logs
+  ansible.builtin.file:
+    path: /epic/logs
+    state: directory
+    owner: epicadm
+    group: epicuser
+    mode: "0755"
+
+- name: Create /epic/conf
+  ansible.builtin.file:
+    path: /epic/conf
+    state: directory
+    owner: epicadm
+    group: epicuser
+    mode: "0755"
 
 - name: Set default file context for bin directories
   community.general.sefcontext:
-    target: "{{ item }}(/.*)?"
+    target: "{{ item | lower }}(/.*)?"
     setype: bin_t
     state: present
   loop:
@@ -359,7 +393,7 @@
 
 - name: Set default file context for instance bin directories
   community.general.sefcontext:
-    target: "/epic/{{ item }}/bin(/.*)?"
+    target: "/epic/{{ item | lower }}/bin"
     setype: bin_t
     state: present
   loop: "{{ odb_instances }}"
@@ -368,21 +402,60 @@
     - ansible_facts['os_family'] == 'RedHat'
   notify: Run restorecon epic
 
+- name: Set default file context for instance bin directories
+  community.general.sefcontext:
+    target: "/epic/{{ item | lower }}/bin(/.*)?"
+    setype: bin_t
+    state: present
+  loop: "{{ odb_instances }}"
+  when:
+    - odb_instances is defined
+    - ansible_facts['os_family'] == 'RedHat'
+  notify: Run restorecon epic
+
+
+- name: Set the permissions for irisstart
+  ansible.builtin.file:
+    path: "/epic/{{ item | lower }}/irissys/bin/irisstart"
+    owner: root
+    group: epicsys
+    mode: '04610' # also works
+    state: file
+  loop: "{{ odb_instances }}"
+  when:
+    - odb_instances is defined
+    - ansible_facts['os_family'] == 'RedHat'
+  ignore_errors: true
+
+- name: Set the permissions for irisstop
+  ansible.builtin.file:
+    path: "/epic/{{ item | lower }}/irissys/bin/irisstop"
+    owner: root
+    group: epicsys
+    mode: '04610' # also works
+    state: file
+  loop: "{{ odb_instances }}"
+  when:
+    - odb_instances is defined
+    - ansible_facts['os_family'] == 'RedHat'
+  ignore_errors: true
+
 - name: Install service files
   ansible.builtin.copy:
     src: "{{ item }}.service"
     dest: /etc/systemd/system/{{ item }}.service
     owner: root
     group: root
-    mode: 0664
+    mode: "0664"
   loop:
     - epic@
     - redalert
 
 - name: Make sure epic@.service is enabled
   ansible.builtin.systemd:
-    name: epic@{{ item }}
+    name: "epic@{{ item | lower }}"
     enabled: true
+    daemon_reload: true
   loop: "{{ odb_instances }}"
   when: useepicatservice
 
@@ -390,6 +463,7 @@
   ansible.builtin.systemd:
     name: redalert
     enabled: true
+    daemon_reload: true
 
 ### Copy scripts and miscelaneous files
 - name: Check sslcert binary
@@ -425,7 +499,7 @@
     subject_alt_name: "{{ dnsnames | map('regex_replace', '^', 'DNS:') | list }}"
 
 - name: Get ESMP_TRUSTED_DIR
-  shell: set -o pipefail &
+  ansible.builtin.shell: set -o pipefail &
     grep '<ESMP_TRUSTED_DIR>' /epic/redalert/conf/epic.conf | cut -d '>' -f 2 | cut -d '<' -f 1
   register: esmp_trusted_dir
   check_mode: false
@@ -433,7 +507,7 @@
   when: ra_conf_file_stat['stat']['exists']
 
 - name: Get contents of ESMP_TRUSTED_DIR
-  find:
+  ansible.builtin.find:
     paths: "{{ esmp_trusted_dir['stdout'] }}"
     pattern: '*'
   register: esmp_trusted_dir_files
@@ -444,13 +518,13 @@
 - name: Get CA bundle from uri
   when: ca_bundle is match("https?://.*")
   block:
-    - name: copy CA bunle from {{ ca_bundle }}
+    - name: Copy CA bunle from {{ ca_bundle }}
       ansible.builtin.copy:
         content: "{{ lookup('ansible.builtin.url', ca_bundle, split_lines=false) }}"
-        dest: /epic/pki/{{ ca_bundle | basename }}
+        dest: /epic/pki/ca/{{ ca_bundle | basename }}
         owner: epicadm
         group: epicsys
-        mode: 0644
+        mode: "0644"
       notify:
         - Update RedAlert CAs
         - Clear RedAlert CAs
@@ -458,7 +532,7 @@
 - name: Get CA bundle from file
   when: ca_bundle is not match("https?://.*")
   block:
-    - name: check for CA bundle
+    - name: Check for CA bundle
       ansible.builtin.stat:
         path: files/{{ ca_bundle }}
       register: ca_bundle_stat
@@ -468,10 +542,10 @@
     - name: Copy CA certs
       ansible.builtin.copy:
         src: "{{ ca_bundle }}"
-        dest: /epic/pki/{{ ca_bundle | basename }}
+        dest: /epic/pki/ca/{{ ca_bundle | basename }}
         owner: epicadm
         group: epicsys
-        mode: 0644
+        mode: "0644"
       notify:
         - Update RedAlert CAs
         - Clear RedAlert CAs
@@ -481,7 +555,6 @@
 - name: Set ESMP password
   when: epic_esmp_password is defined
   block:
-
     - name: Ensure password is decrypted
       ansible.builtin.set_fact:
         internal_esmp_password: "{{ epic_esmp_password }}"
@@ -493,13 +566,22 @@
       changed_when: false
       register: redalert_key_stat
 
+
+    - name: Make sure Directly exsists
+      ansible.builtin.file:
+        path: /epic/redalert/conf/
+        owner: epicadm
+        group: epicsys
+        state: directory
+
+
     - name: Copy stub when key.conf doesn't exist
       ansible.builtin.copy:
         src: key.conf
         dest: /epic/redalert/conf/key.conf
         owner: epicadm
         group: epicsys
-        mode: 0400
+        mode: "0400"
       when: not redalert_key_stat['stat']['exists']
 
     - name: Inject ESMP password
@@ -510,11 +592,11 @@
         insertbefore: </xml>
         owner: epicadm
         group: epicsys
-        mode: 0400
+        mode: "0400"
       notify: Restart ESMP
 
 - name: Get selinux port tags for ssh_port_t
-  shell: set -o pipefail |
+  ansible.builtin.shell: set -o pipefail |
     /sbin/semanage port -l |
     grep ssh_port_t
   register: ssh_port_t_stat
@@ -538,7 +620,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0755  # noqa risky-file-permissions
+    mode: "0755"  # noqa risky-file-permissions
 
 - name: Disable root login over SSH
   ansible.builtin.lineinfile:
@@ -571,7 +653,7 @@
     path: /etc/ssh/sshd_config
   notify: Restart sshd
 
-- name: Set epic menu exclusions 
+- name: Set epic menu exclusions
   ansible.builtin.lineinfile:
     line: Match LocalPort 22 User {{ epicmenu_exclusions | join(',') }}
     regexp: '^Match LocalPort 22 User'
@@ -609,7 +691,7 @@
     dest: /usr/local/bin/{{ item | basename }}
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
   with_fileglob: localbin/*
 
 - name: Create manage_epicuser_group
@@ -618,7 +700,7 @@
     dest: /usr/local/bin/manage_epicuser_group
     owner: root
     group: root
-    mode: 0775
+    mode: "0775"
 
 - name: Add cron job for manage_epicuser_group
   ansible.builtin.file:
@@ -642,11 +724,11 @@
 
 ### Sudoers config
 - name: Create working copy of system sudoers file
-  command: cp -f /etc/sudoers /etc/sudoers.tmp
+  ansible.builtin.command: cp -f /etc/sudoers /etc/sudoers.tmp
   changed_when: false
 
 - name: Back up sudoers file
-  command: cp -f /etc/sudoers /etc/sudoers.bak
+  ansible.builtin.command: cp -f /etc/sudoers /etc/sudoers.bak
   changed_when: false
 
 - name: Remove Defaults requiretty
@@ -656,13 +738,13 @@
     regexp: 'Defaults    requiretty'
 
 - name: Check for sudoers differences
-  command: diff /etc/sudoers.tmp /etc/sudoers
+  ansible.builtin.command: diff /etc/sudoers.tmp /etc/sudoers
   register: sudoers_diff
   ignore_errors: true
   changed_when: false
 
 - name: Check working copy of suders file, and replace active sudoers config
-  shell: set -o pipefail |
+  ansible.builtin.shell: set -o pipefail |
     visudo -q -c -f /etc/sudoers.tmp &&
     cp -f /etc/sudoers.tmp /etc/sudoers
   register: sudoers_result
@@ -670,7 +752,7 @@
 
 ### Setup firewall rules
 - name: Refresh service facts
-  service_facts:
+  ansible.builtin.service_facts:
   tags:
     - firewall
 
@@ -697,7 +779,7 @@
     - firewall
 
 - name: Setup firewall rules
-  include_tasks: firewall_rules.yml
+  ansible.builtin.include_tasks: firewall_rules.yml
   loop: "{{ odb_firewall_services }}"
   loop_control:
     loop_var: firewall_service
@@ -713,7 +795,7 @@
   when: ansible_distribution != 'Ubuntu'
   block:
     - name: Reload firewalld
-      command: firewall-cmd --reload
+      ansible.builtin.command: firewall-cmd --reload
       changed_when: false
       when: ansible_facts['services']['firewalld.service']['state'] == 'running'
       tags:
@@ -791,7 +873,7 @@
     dest: /etc/vmware-tools/tools.conf
     owner: root
     group: root
-    mode: 0644  # noqa risky-file-permissions
+    mode: "0644"  # noqa risky-file-permissions
   when: etc_vmwaretools['stat']['exists']
   notify: Restart vmtools
 
@@ -828,7 +910,7 @@
     state: directory
     owner: epicadm
     group: epicuser
-    mode: 0755
+    mode: "0755"
   tags:
     - epicmenu
 
@@ -838,7 +920,7 @@
     dest: /epic/conf/{{ (item | basename | splitext)[0] }}
     owner: epicadm
     group: epicsys
-    mode: 0644
+    mode: "0644"
     backup: true
   with_fileglob: templates/epicmenu/*
   tags:
@@ -856,7 +938,7 @@
     - epicmenu
 
 - name: Install environment epicmenus
-  include_tasks: epicmenu.yml
+  ansible.builtin.include_tasks: epicmenu.yml
   loop: "{{ epic_environments }}"
   loop_control:
     loop_var: EpicEnvironment
@@ -864,7 +946,7 @@
     - epicmenu
 
 - name: Manage local IRIS users
-  include_tasks: iris_users_loop.yml
+  ansible.builtin.include_tasks: iris_users_loop.yml
   loop: "{{ epic_environments }}"
   loop_control:
     loop_var: EpicEnvironment
@@ -875,7 +957,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
   when: ansible_virtualization_type == 'VMware'
 
 - name: Copy quiesce script
@@ -884,5 +966,5 @@
     dest: /etc/vmware-tools/backupScripts.d/quiesce
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
   when: ansible_virtualization_type == 'VMware'

@@ -25,7 +25,7 @@
 
 - name: Set ufw ports line
   ansible.builtin.set_fact:
-    ufw_epic_firewall_ports: "{{ ufw_epic_firewall_ports | default('') }}{{ (ansible_loop['index'] > 1) | ternary(',','') }}{{ item['port'] }}"
+    ufw_epic_firewall_ports: "{{ ufw_epic_firewall_ports | default('') }}{{ (ansible_loop['index'] > 1) | ternary(',', '') }}{{ item['port'] }}"
   loop: "{{ epic_firewall_ports }}"
   loop_control:
     extended: true
@@ -40,24 +40,26 @@
   tags:
     - firewall
 
-- name: Copy {{ epic_firewall_short }} firewall rule
+- name: Copy firewall rule {{ epic_firewall_short }}
   ansible.builtin.template:
     src: firewalld.xml.j2
     dest: /etc/firewalld/services/{{ epic_firewall_short }}.xml
     owner: root
     group: root
-    mode: 0660
+    mode: "0660"
   when: ansible_distribution != 'Ubuntu'
   tags:
     - firewall
 
-- name: Copy {{ epic_firewall_short }} firewall rule
+- name: Copy firewall rule {{ epic_firewall_short }}
   ansible.builtin.template:
     src: ufw_app.j2
     dest: /etc/ufw/applications.d/{{ epic_firewall_short }}
     owner: root
     group: root
-    mode: 0660
+    mode: "0660"
   when: ansible_distribution == 'Ubuntu'
   tags:
     - firewall
+
+...

@@ -1,4 +1,27 @@
 ---
+
+#                    /
+#                   <=
+#                   |\
+#           \|/     |
+#            |______|
+#            /       \
+#           / /_\ /_\ \
+#           |   : :   |
+#          /|   : :   |\               _   ...
+#         : |  /___\  | :            _| |  ...~~~~~
+#         : |  [   ]  | ;           ( |U|  ...~~~~~
+#          \|  [   ]  |/             A|S|  ~~~~~~~~
+#       +-------|-|-------+          H|A|  ~~~~~~~~
+#      /|       |-|       |\         H|_|  |
+#     /\|       |-|       |/\        HIp   |
+#    /  +-------|-|-------+  \       wII   |
+#   /          /|-|\          \       II   |
+#  /            |-|            \      II   |
+# `-'           |-|           `-'    cxI   |
+#              `---'
+
+
 useepicatservice: false
 
 members_command: getent group
@@ -14,6 +37,13 @@ epic_csr:
   c: US
 
 cachegrp: false
+
+cachegrp_gid: 10002
+irisuser_gid: 10002
+
+tuned_hugepages:
+  hugepagesz: 1G
+  hugepages: 93
 
 epic_users:
   - user: epicadm
@@ -51,3 +81,23 @@ epic_users:
     uid: 10004
     state: present
     password: "{{ epic_passwords['iscagent'] }}"
+
+epic_groups:
+  - name: 'epicsys'
+    gid: 10000
+  - name: 'epicuser'
+    gid: 10001
+  - name: 'dmngrp'
+    gid: 10003
+  - name: 'iscagent'
+    gid: 10004
+  - name: 'epicdmn'
+    gid: 10005
+  - name: 'epicis'
+    gid: 10006
+  - name: 'epicts'
+    gid: 10007
+  - name: 'epictxt'
+    gid: 10008
+  - name: 'epicsts'
+    gid: 10009

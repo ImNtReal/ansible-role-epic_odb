@@ -8,7 +8,8 @@
   become: true
   become_user: epicadm
 
-- include_tasks: iris_users.yml
+- name: Create iris users
+  ansible.builtin.include_tasks: iris_users.yml
   loop: "{{ iris_users }}"
   loop_control:
     loop_var: iris_user
