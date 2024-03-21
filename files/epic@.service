@@ -8,8 +8,10 @@ RequiresMountsFor=/epic
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/shebang /epic/%i/bin/runlevel -r u
-ExecStop=/usr/local/bin/shebang /epic/%i/bin/runlevel -r c
+#ExecStart=/usr/bin/ksh /epic/%i/bin/runlevel -r u
+#ExecStop=/usr/bin/ksh /epic/%i/bin/runlevel -r c
+ExecStart=/epic/%i/bin/runlevel -r u
+ExecStop=/epic/%i/bin/runlevel -r c
 RemainAfterExit=yes
 Restart=no
 
