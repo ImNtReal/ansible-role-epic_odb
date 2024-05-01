@@ -257,7 +257,7 @@
         path: /etc/tuned/epic/tuned.conf
         section: sysctl
         option: hugepagesz
-        value: "{{ tuned_hugepages.hugepagesz }}"
+        value: "{{ hugepage_size }}"
       notify: Set tuned profile
 
     - name: Configure hugepage settings
@@ -265,7 +265,7 @@
         path: /etc/tuned/epic/tuned.conf
         section: sysctl
         option: hugepages
-        value: "{{ tuned_hugepages.hugepages }}"
+        value: "{{ hugepages }}"
       notify: Set tuned profile
 
     - name: Configure nosmt for public clouds
