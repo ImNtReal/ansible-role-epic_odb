@@ -247,7 +247,7 @@
     - name: Configure settings group
       community.general.ini_file:
         path: /etc/tuned/epic/tuned.conf
-        section: variables
+        section: sysctl
         option: vm.hugetlb_shm_group
         value: 10000
       notify: Set tuned profile
