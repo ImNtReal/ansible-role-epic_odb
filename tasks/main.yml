@@ -252,10 +252,10 @@
         value: 10000
       notify: Set tuned profile
 
-    - name: Configure hugepage settingsz
+    - name: Configure hugepage size
       community.general.ini_file:
         path: /etc/tuned/epic/tuned.conf
-        section: sysctl
+        section: variables
         option: hugepagesz
         value: "{{ hugepage_size }}"
       notify: Set tuned profile
@@ -263,7 +263,7 @@
     - name: Configure hugepage settings
       community.general.ini_file:
         path: /etc/tuned/epic/tuned.conf
-        section: sysctl
+        section: variables
         option: hugepages
         value: "{{ hugepages }}"
       notify: Set tuned profile
