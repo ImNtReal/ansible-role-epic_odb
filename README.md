@@ -26,6 +26,7 @@ Variables set only in inventory:
     odb_instances: List of instances on server.
     epic_environments: List of Epic environments along with their respective instances
     nr_hugepages: Number of hugepages
+    local_firewall: Whether or not to use firewalld on RHEL or ufw on Ubuntu
     firewalld_services: Definition of firewalld services to create
     epic_passwords: Password hashes for local accounts. Hashes for RHEL 7 can be
       generated using: openssl passwd -6 on openssl v1.1 or newer or examples found

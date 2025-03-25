@@ -47,7 +47,6 @@
           - sysstat
           - psmisc
           - openssh-server
-          - firewalld
           - net-tools
           - lsscsi
           - virt-what
@@ -67,7 +66,7 @@
           - epic-config
         state: present
       tags:
-        - firewall
+        - packages
 
 - name: Install packages for Red Hat distros
   when: ansible_distribution == 'Ubuntu'
@@ -104,6 +103,8 @@
           - iftop
           - nmon
         state: present
+      tags:
+        - packages
 
 ### Post package install tasks
 - name: Gather package facts
@@ -637,6 +638,7 @@
   when:
     - ansible_env['container'] is not defined
     - ansible_distribution != 'Ubuntu'
+    - local_firewall | default(true)
   tags:
     - firewall
 
@@ -648,6 +650,7 @@
   when:
     - ansible_env['container'] is not defined
     - ansible_distribution == 'Ubuntu'
+    - local_firewall | default(true)
   tags:
     - firewall
 
@@ -656,6 +659,7 @@
   loop: "{{ odb_firewall_services }}"
   loop_control:
     loop_var: firewall_service
+  when: local_firewall | default(true)
   tags:
     - firewall
 
@@ -665,7 +669,9 @@
     - firewall
 
 - name: Enable firewall rules on EL
-  when: ansible_distribution != 'Ubuntu'
+  when:
+    - ansible_distribution != 'Ubuntu'
+    - local_firewall | default(true)
   block:
     - name: Reload firewalld
       ansible.builtin.command: firewall-cmd --reload
@@ -695,7 +701,9 @@
         - firewall
 
 - name: Enable firewall rules on Ubuntu
-  when: ansible_distribution == 'Ubuntu'
+  when:
+   - ansible_distribution == 'Ubuntu'
+   - local_firewall | default(true)
   block:
     - name: Reload firewalld
       command: ufw reload
