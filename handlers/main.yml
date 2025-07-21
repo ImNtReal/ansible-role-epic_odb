@@ -39,3 +39,4 @@
   command: /epic/redalert/bin/esmp --restart
   become: true
   become_user: epicadm
+  when: esmp_stat['stat']['exists']

@@ -458,6 +458,11 @@
         mode: "0400"
       when: not redalert_key_stat['stat']['exists']
 
+    - name: Stat esmp binary
+      ansible.builtin.stat:
+        path: /epic/redalert/bin/esmp
+      register: esmp_stat
+
     - name: Inject ESMP password
       ansible.builtin.lineinfile:
         path: /epic/redalert/conf/key.conf
