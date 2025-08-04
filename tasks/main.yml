@@ -358,6 +358,8 @@
     cipher: auto
     owner: epicadm
     group: epicsys
+  tags:
+    - tls
 
 - name: Generate CSR
   community.crypto.openssl_csr:
@@ -371,6 +373,8 @@
     state_or_province_name: "{{ epic_csr['s'] }}"
     country_name: "{{ epic_csr['c'] }}"
     subject_alt_name: "{{ dnsnames | map('regex_replace', '^', 'DNS:') | list }}"
+  tags:
+    - tls
 
 - name: Get ESMP_TRUSTED_DIR
   ansible.builtin.shell: set -o pipefail &
@@ -379,6 +383,8 @@
   check_mode: false
   changed_when: false
   when: ra_conf_file_stat['stat']['exists']
+  tags:
+    - tls
 
 - name: Get contents of ESMP_TRUSTED_DIR
   ansible.builtin.find:
@@ -388,9 +394,13 @@
   when:
     - ra_conf_file_stat
     - esmp_trusted_dir['stdout'] | default('')
+  tags:
+    - tls
 
 - name: Get CA bundle from uri
   when: ca_bundle is match("https?://.*")
+  tags:
+    - tls
   block:
     - name: Copy CA bunle from {{ ca_bundle }}
       ansible.builtin.copy:
@@ -402,9 +412,13 @@
       notify:
         - Update RedAlert CAs
         - Clear RedAlert CAs
+      tags:
+        - tls
 
 - name: Get CA bundle from file
   when: ca_bundle is not match("https?://.*")
+  tags:
+    - tls
   block:
     - name: Check for CA bundle
       ansible.builtin.stat:
@@ -412,6 +426,8 @@
       register: ca_bundle_stat
       changed_when: false
       check_mode: false
+      tags:
+        - tls
 
     - name: Copy CA certs
       ansible.builtin.copy:
@@ -424,6 +440,8 @@
         - Update RedAlert CAs
         - Clear RedAlert CAs
       when: ca_bundle_stat['stat']['exists']
+      tags:
+        - tls
 
 ### Set ESMP password
 - name: Set ESMP password
@@ -440,14 +458,12 @@
       changed_when: false
       register: redalert_key_stat
 
-
     - name: Make sure Directly exsists
       ansible.builtin.file:
         path: /epic/redalert/conf/
         owner: epicadm
         group: epicsys
         state: directory
-
 
     - name: Copy stub when key.conf doesn't exist
       ansible.builtin.copy:
