@@ -9,6 +9,10 @@
       register: user_info
       become: true
       become_user: epicadm
+    - name: Verify that user exists
+      ansible.builtin.assert:
+        that:
+          "'does not exist on this system' not in user_info['stdout']"
   rescue:
     - name: Create user {{ iris_user['username'] }}
       ansible.builtin.command: |
