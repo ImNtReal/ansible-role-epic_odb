@@ -19,7 +19,8 @@
         /epic/{{ EpicEnvironment['Instance'] | lower }}/bin/cusers --add --users {{ iris_user['username'] }} --roles {{ iris_user['roles'] | join(',') }}
       become: true
       become_user: epicadm
-      changed_when: false
+      register: create_user_result
+      changed_when: "create_user_result[stdout]"
       check_mode: false
     - name: Get user info for {{ iris_user['username'] }}
       ansible.builtin.command: |
